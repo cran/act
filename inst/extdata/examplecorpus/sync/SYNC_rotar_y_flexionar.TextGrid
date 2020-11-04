@@ -1,0 +1,196 @@
+File type = "ooTextFile"
+Object class = "TextGrid"
+
+xmin = 0 
+xmax = 24.038763690132328 
+tiers? <exists> 
+size = 2 
+item []: 
+    item [1]:
+        class = "IntervalTier" 
+        name = "TeaF-Julieta" 
+        xmin = 0 
+        xmax = 24.038763690132328 
+        intervals: size = 22 
+        intervals [1]:
+            xmin = 0 
+            xmax = 3.957785469274313 
+            text = "" 
+        intervals [2]:
+            xmin = 3.957785469274313 
+            xmax = 4.225785469274342 
+            text = "<<f>SÍ;>" 
+        intervals [3]:
+            xmin = 4.225785469274342 
+            xmax = 4.479785469274248 
+            text = "(-)" 
+        intervals [4]:
+            xmin = 4.479785469274248 
+            xmax = 4.978785469274044 
+            text = "aHOra. (-)" 
+        intervals [5]:
+            xmin = 4.978785469274044 
+            xmax = 5.140785469274306 
+            text = "" 
+        intervals [6]:
+            xmin = 5.140785469274306 
+            xmax = 7.256785469274291 
+            text = "°t necesito que cuan[do querés q]ue ENtre," 
+        intervals [7]:
+            xmin = 7.256785469274291 
+            xmax = 7.421785469274255 
+            text = "(.)" 
+        intervals [8]:
+            xmin = 7.421785469274255 
+            xmax = 8.68878546927408 
+            text = "" 
+        intervals [9]:
+            xmin = 8.68878546927408 
+            xmax = 8.978785469274044 
+            text = "SÍ;" 
+        intervals [10]:
+            xmin = 8.978785469274044 
+            xmax = 9.316785469273782 
+            text = "(0.3)" 
+        intervals [11]:
+            xmin = 9.316785469273782 
+            xmax = 9.613785469274262 
+            text = "" 
+        intervals [12]:
+            xmin = 9.613785469274262 
+            xmax = 10.466785469274328 
+            text = "e:!XAC!to;" 
+        intervals [13]:
+            xmin = 10.466785469274328 
+            xmax = 10.54278546927435 
+            text = "(.)" 
+        intervals [14]:
+            xmin = 10.54278546927435 
+            xmax = 11.921785469274255 
+            text = "que piEnses en hacer ESto;=mirÁ." 
+        intervals [15]:
+            xmin = 11.921785469274255 
+            xmax = 13.195785469273687 
+            text = "(1.3)" 
+        intervals [16]:
+            xmin = 13.195785469273687 
+            xmax = 16.29578546927405 
+            text = "" 
+        intervals [17]:
+            xmin = 16.29578546927405 
+            xmax = 18.077785469274204 
+            text = "como rotAr y (.) y flexioNAR;" 
+        intervals [18]:
+            xmin = 18.077785469274204 
+            xmax = 18.325785469273796 
+            text = "(-)" 
+        intervals [19]:
+            xmin = 18.325785469273796 
+            xmax = 21.40978546927363 
+            text = "" 
+        intervals [20]:
+            xmin = 21.40978546927363 
+            xmax = 21.747785469274277 
+            text = "CLAro." 
+        intervals [21]:
+            xmin = 21.747785469274277 
+            xmax = 22.655785469273724 
+            text = "(0.9)" 
+        intervals [22]:
+            xmin = 22.655785469273724 
+            xmax = 24.038763690132328 
+            text = "" 
+    item [2]:
+        class = "IntervalTier" 
+        name = "StuL2" 
+        xmin = 0 
+        xmax = 24.038763690132328 
+        intervals: size = 22 
+        intervals [1]:
+            xmin = 0 
+            xmax = 6.161785469274037 
+            text = "" 
+        intervals [2]:
+            xmin = 6.161785469274037 
+            xmax = 6.618785469274371 
+            text = "[V:HUM;]" 
+        intervals [3]:
+            xmin = 6.618785469274371 
+            xmax = 7.421785469274255 
+            text = "" 
+        intervals [4]:
+            xmin = 7.421785469274255 
+            xmax = 7.6677854692743495 
+            text = "SÍ." 
+        intervals [5]:
+            xmin = 7.6677854692743495 
+            xmax = 7.988785469274262 
+            text = "(0.3)" 
+        intervals [6]:
+            xmin = 7.988785469274262 
+            xmax = 8.439785469274284 
+            text = "más aCÁ;" 
+        intervals [7]:
+            xmin = 8.439785469274284 
+            xmax = 8.68878546927408 
+            text = "(-)" 
+        intervals [8]:
+            xmin = 8.68878546927408 
+            xmax = 9.316785469273782 
+            text = "" 
+        intervals [9]:
+            xmin = 9.316785469273782 
+            xmax = 9.613785469274262 
+            text = "más aHÍ." 
+        intervals [10]:
+            xmin = 9.613785469274262 
+            xmax = 13.195785469273687 
+            text = "" 
+        intervals [11]:
+            xmin = 13.195785469273687 
+            xmax = 13.506785469274291 
+            text = "CLAro." 
+        intervals [12]:
+            xmin = 13.506785469274291 
+            xmax = 16.29578546927405 
+            text = "(2.8)" 
+        intervals [13]:
+            xmin = 16.29578546927405 
+            xmax = 18.325785469273796 
+            text = "" 
+        intervals [14]:
+            xmin = 18.325785469273796 
+            xmax = 18.617785469274168 
+            text = "CLAro." 
+        intervals [15]:
+            xmin = 18.617785469274168 
+            xmax = 18.859785469274357 
+            text = "(-)" 
+        intervals [16]:
+            xmin = 18.859785469274357 
+            xmax = 20.90978546927363 
+            text = "es como cuando te marco el de acÁ que te hago ESto;" 
+        intervals [17]:
+            xmin = 20.90978546927363 
+            xmax = 21.40978546927363 
+            text = "(0.5)" 
+        intervals [18]:
+            xmin = 21.40978546927363 
+            xmax = 22.655785469273724 
+            text = "" 
+        intervals [19]:
+            xmin = 22.655785469273724 
+            xmax = 22.87078546927387 
+            text = "aHÍ." 
+        intervals [20]:
+            xmin = 22.87078546927387 
+            xmax = 23.257785469273585 
+            text = "(0.4)" 
+        intervals [21]:
+            xmin = 23.257785469273585 
+            xmax = 23.603785469274044 
+            text = "V:HUM." 
+        intervals [22]:
+            xmin = 23.603785469274044 
+            xmax = 24.038763690132328 
+            text = "(0.5)" 
