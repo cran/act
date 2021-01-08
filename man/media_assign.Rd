@@ -5,27 +5,27 @@
 \title{Assign media file links to transcript objects}
 \usage{
 media_assign(
-  x = NULL,
-  filterFile = "*\\\\.(wav|mp3|aif|aiff|mp4)",
-  searchFolder = NULL,
+  x,
+  searchPaths = NULL,
   searchInSubfolders = TRUE,
-  filterTranscript = NULL,
-  removeExistingMedia = TRUE,
+  filterFile = "",
+  transcriptNames = NULL,
+  deleteExistingMedia = TRUE,
   onlyUniqueFiles = TRUE
 )
 }
 \arguments{
 \item{x}{Corpus object.}
 
-\item{filterFile}{Character string; regular expression of file types to look for.}
-
-\item{searchFolder}{Character string; folder in which media files should be searched (if \code{NULL} the folder specified in \code{x@folders.media} will be used).}
+\item{searchPaths}{Vector of character strings; paths where media files should be searched; if path is not defined, the paths given in \code{x@paths.media.files} will be used).}
 
 \item{searchInSubfolders}{Logical; if \code{FALSE} only the main level of the directory will be scanned for media, if \code{TRUE} sub folders will be scanned for media, too.}
 
-\item{filterTranscript}{Character string; search media files only for  transcripts that match the regular expression.}
+\item{filterFile}{Character string; Regular expression of files to look for.}
 
-\item{removeExistingMedia}{Logical; if \code{TRUE} existing media links will be removed, if \code{FALSE} existing media links will be preserved and new links will be added.}
+\item{transcriptNames}{Vector of character strings; Names of the transcripts for which you want to search media files; leave empty if you want to search media for all transcripts in the corpus object.}
+
+\item{deleteExistingMedia}{Logical; if \code{TRUE} existing media links will be deleted, if \code{FALSE} existing media links will be preserved and new links will be added.}
 
 \item{onlyUniqueFiles}{Logical; if \code{TRUE} media files with the same name (in different locations) will only be added once; if \code{FALSE} all media files found will be added, irrespective of possible doublets.}
 }
@@ -37,6 +37,10 @@ Searches for media files in folders and assigns the links to transcript objects 
 The function uses the name of the transcript to find the media files, 
 e.g. the function assumes that the annotation files have the same name as the media files, except from the suffix/the file type.
 }
+\details{
+Only the the file types set in \code{options()$act.fileformats.audio} and \code{options()$act.fileformats.video} will be recognized. 
+You can modify these options to recognize other media types.
+}
 \examples{
 library(act)
 
@@ -44,11 +48,11 @@ library(act)
 # Please be aware that that the example corpus that comes with the package
 # does NOT contain media files. Please download the entire example corpus
 # with media files if you want to use this function reasonably.
-examplecorpus@folders.media <- c("", "")
+examplecorpus@paths.media.files <- c("", "")
 
 examplecorpus <- act::media_assign(examplecorpus)
 
 }
 \seealso{
-\link{media_remove}, \link{media_getpath}
+\link{media_delete}, \link{media_getPathToExistingFile}
 }

@@ -2,6 +2,8 @@ pathTextGrid$ ="PATHTEXTGRID"
 pathLongSound$ = "PATHLONGSOUND"
 selStartSec = SELSTARTSEC
 selEndSec = SELENDSEC
+playSelection = PLAYSELECTION
+closeAfterPlaying = CLOSEAFTERPLAYING
 
 #--- get name of textgrid
 @split: pathTextGrid$, "/"
@@ -68,6 +70,14 @@ endif
 nowarn editor: "TextGrid " + nameTextGrid$
 nowarn Select: selStartSec, selEndSec
 nowarn Zoom: selStartSec-0.5, selEndSec+0.5
+
+if playSelection==1
+	Play: selStartSec, selEndSec
+	if closeAfterPlaying==1
+		endeditor
+	endif
+endif
+
 
 
 

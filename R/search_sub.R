@@ -9,26 +9,43 @@
 #' @param x Corpus object.
 #' @param s Search object.
 #' @param pattern Character string; search pattern as regular expression
-#' @param filterTiersInclude Character string; limit search to tiers that match the regular expression
-#' @param filterTiersExclude Character string; limit search to tiers that match the regular expression
+#' @param filterTierInclude Character string; limit search to tiers that match the regular expression
+#' @param filterTierExclude Character string; limit search to tiers that match the regular expression
 #' @param destinationColumn Character string; name of column where results of sub search will be stored
-#' @param removeLinesWithNoResults Logical; if \code{TRUE} search results will be removed for which the sub search does not give any results
+#' @param deleteLinesWithNoResults Logical; if \code{TRUE} search results will be deleted for which the sub search does not give any results
 #' @param excludeHitsWithinSameTier Logical; if \code{TRUE} the function will not add hits from the same tier as the original search result; if \code{FALSE} hits from the same tier as the original search result will be included.
 #'
 #' @return Data frame.
+#' 
+#' @seealso \link{search_new}, \link{search_run}, \link{search_meta}
+#' 
 #' @export
 #'
 #' @example inst/examples/search_sub.R
 
-search_sub <- function(x, s, pattern, filterTiersInclude="", filterTiersExclude="", destinationColumn="subsearch", removeLinesWithNoResults=FALSE, excludeHitsWithinSameTier=TRUE) {
-	#x<-examplecorpus
-	#s<-mysearch
+search_sub <- function(x, 
+					   s, 
+					   pattern, 
+					   filterTierInclude="", 
+					   filterTierExclude="", 
+					   destinationColumn="subsearch", 
+					   deleteLinesWithNoResults=FALSE, 
+					   excludeHitsWithinSameTier=TRUE) {
+	
+	#x <-examplecorpus
+	#s <-mysearch
 	#pattern <- myRegEx
-	#destinationColumn<-"subsearch"
-	#filterTiersInclude<-""
-	#filterTiersExclude<-""
-	#removeLinesWithNoResults<-FALSE
-	#excludeHitsWithinSameTier<-TRUE
+	#destinationColumn <-"subsearch"
+	#filterTierInclude <-""
+	#filterTierExclude <-""
+	#deleteLinesWithNoResults <-FALSE
+	#excludeHitsWithinSameTier <-TRUE
+	
+	
+	
+	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
+	if (missing(s)) 	{stop("Search object in parameter 's' is missing.") 		} else { if (class(s)[[1]]!="search")		{stop("Parameter 's' needs to be a search object.") 	} }
+	
 	if (destinationColumn=="") {
 		stop("Destination column name may not be empty.")
 	}
@@ -45,12 +62,12 @@ search_sub <- function(x, s, pattern, filterTiersInclude="", filterTiersExclude=
 		}
 	}
 	
-	s@results<-cbind(s@results, newCol=as.character(rep(times=nrow(s@results), "")), stringsAsFactors=FALSE)
+	s@results <-cbind(s@results, newCol=as.character(rep(times=nrow(s@results), "")), stringsAsFactors=FALSE)
 	colnames(s@results)[ncol(s@results)] <- destinationColumn
-	#i<-1
+	#i <-1
 	for (i in 1:nrow(s@results)) {
 		#get all info
-		search.sub <- act::search_new(x=x, pattern=pattern, filterTranscriptsInclude=s@results$transcriptName[i], filterTiersInclude=filterTiersInclude, filterTiersExclude=filterTiersExclude, startSec=s@results$startSec[i], endSec=s@results$endSec[i], searchMode="content", searchNormalized=FALSE, makeConcordance=FALSE, showProgress=FALSE)
+		search.sub <- act::search_new(x=x, pattern=pattern, filterTranscriptInclude=s@results$transcript.name[i], filterTierInclude=filterTierInclude, filterTierExclude=filterTierExclude, filterSectionStartsec=s@results$startSec[i], filterSectionEndsec=s@results$endSec[i], searchMode="content", searchNormalized=FALSE, concordanceMake=FALSE)
 		searchResults.sub <- search.sub@results
 		
 		#add information to new column
@@ -59,7 +76,7 @@ search_sub <- function(x, s, pattern, filterTiersInclude="", filterTiersExclude=
 		} else {
 			# if results from the same tier should be excluded
 			if (excludeHitsWithinSameTier) {
-				pos<-grep(pattern=s@results$tier[i], x=searchResults.sub$tierName)
+				pos <-grep(pattern=s@results$tier[i], x=searchResults.sub$tier.name)
 				if (length(pos)>0) {
 					searchResults.sub <- searchResults.sub[-pos, ]
 				}
@@ -71,7 +88,7 @@ search_sub <- function(x, s, pattern, filterTiersInclude="", filterTiersExclude=
 		}
 	}
 	
-	if (removeLinesWithNoResults==TRUE) {
+	if (deleteLinesWithNoResults==TRUE) {
 		s@results <- s@results[!is.na(s@results[, destinationColumn]), ]
 	}
 	

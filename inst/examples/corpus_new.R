@@ -14,9 +14,9 @@ path <- system.file("extdata", "examplecorpus", package="act")
 }
 
 # The following command creates a new corpus object
-mycorpus <- act::corpus_new(corpusname = "mycorpus",
-                            folders_annotationfiles = path,
-                            folders_mediafiles = path)
+mycorpus <- act::corpus_new(name = "mycorpus",
+	pathsAnnotationFiles = path,
+	pathsMediaFiles = path)
 
 # Get a summary
 mycorpus

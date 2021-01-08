@@ -4,16 +4,12 @@
 \alias{search_run}
 \title{Run a search}
 \usage{
-search_run(x, s, showProgress = TRUE, updateX = TRUE)
+search_run(x, s)
 }
 \arguments{
 \item{x}{Corpus object.}
 
 \item{s}{Search object.}
-
-\item{showProgress}{Logical; if \code{TRUE} progress bar will be shown.}
-
-\item{updateX}{Logical; If \code{TRUE} the original corpus object passed as x to the function will also be updated, in case that fulltexts are created or the normalization is performed. If you do not want this, set to \code{FALSE}.}
 }
 \value{
 Search object.
@@ -32,4 +28,21 @@ mysearch <- act::search_new(x=examplecorpus, pattern= "yo", runSearch=FALSE)
 mysearch <- act::search_run(x=examplecorpus, s=mysearch)
 mysearch
 mysearch@results$hit
+
+# Search Only in tiers called "A", in any transcript
+mysearch@filter.tier.names <-"A"
+mysearch@filter.transcript.names <-""
+mysearch <- act::search_run(x=examplecorpus, s=mysearch)
+cbind(mysearch@results$transcript.name, mysearch@results$tier.name, mysearch@results$hit)
+
+# Search Only in tiers called "A", only in transcript "ARG_I_PER_Alejo"
+mysearch@filter.tier.names <-"A"
+mysearch@filter.transcript.names <-"ARG_I_PER_Alejo"
+mysearch <- act::search_run(x=examplecorpus, s=mysearch)
+cbind(mysearch@results$transcript.name, mysearch@results$tier.name, mysearch@results$hit)
+
+
+}
+\seealso{
+\link{search_new}, \link{search_meta}, \link{search_sub}
 }

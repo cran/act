@@ -39,6 +39,6 @@ unzip(zipfile=temp, exdir=destinationpath)
 }
 }
 \seealso{
-, \link{corpus_new}, \link{corpus_load}
+, \link{corpus_new}, \link{corpus_import}
 }
 \keyword{datasets}

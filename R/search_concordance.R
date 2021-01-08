@@ -2,51 +2,46 @@
 #'
 #' @param x Corpus object.
 #' @param s Search object.
-#' @param baseForConcordance Character string; takes the following values: content, fulltext (= default)
 #' @param searchNormalized Logical; if \code{TRUE} function will search in the normalized content, if \code{FALSE} function will search in the original content.
-#' @param showProgress Logical; if \code{TRUE} progress bar will be shown.
 #'
-#' @return Data.frame; data frame with search results and concordance added.
+#' @return Search object.
 #' @export
 #'
 #' @example inst/examples/search_concordance.R
 #' 
-search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormalized=TRUE, showProgress=FALSE) {
+search_concordance <- function(x, 
+							   s, 
+							   searchNormalized=TRUE) {
+	
+	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
+	if (missing(s)) 	{stop("Search object in parameter 's' is missing.") 		} else { if (class(s)[[1]]!="search")		{stop("Parameter 's' needs to be a search object.") 	} }
 	
 	search_concordance_single <- function(mySR, x, showProgress)	{
-		
-		if(is.na(mySR["dataID"])) { return(rep("",5)) }
+		if(is.na(mySR["annotationID"])) { return(rep("",5)) }
 		
 		#nrow(searchResults)
 		hit.pos.fulltext    <- 	strtoi(mySR["hit.pos.fulltext"])
 		hit.pos.content    	<- 	strtoi(mySR["hit.pos.content"])
 		hit.length	    	<-	strtoi(mySR["hit.length"])
-		myTName	<-	as.character(mySR["transcriptName"])
+		myTName	<-	as.character(mySR["transcript.name"])
 		
-		# progress
-		if (showProgress==TRUE)		{	
-			if (exists("act.environment", mode="environment")) {
-				if(exists("pb", envir=act.environment)) {
-					act.environment$pb$tick()
-				}
-			}
-		}
-		
+		#update progress bar
+		helper_progress_tick()
 		
 		# get text for concordance
-		if (baseForConcordance=="fulltext") 		{
+		if (s@search.mode=="fulltext") 		{
 			#get hit pos
 			hit.pos 				<- hit.pos.fulltext
 			
 			#get the full text
-			if (as.character(mySR["searchMode"]) =="byTier") {
-				if (s@searchNormalized==TRUE) {
+			if (as.character(mySR["search.mode"]) =="byTier") {
+				if (s@search.normalized==TRUE) {
 					myFulltext     <- x@transcripts[[myTName]]@fulltext.bytier.norm
 				} else  {
 					myFulltext     <- x@transcripts[[myTName]]@fulltext.bytier.orig
 				}
 			} else {
-				if (s@searchNormalized==TRUE) {
+				if (s@search.normalized==TRUE) {
 					myFulltext     <- x@transcripts[[myTName]]@fulltext.bytime.norm
 				} else  {
 					myFulltext     <- x@transcripts[[myTName]]@fulltext.bytime.orig
@@ -61,7 +56,7 @@ search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormal
 			hit.pos 				<- hit.pos.content
 			
 			#get content
-			if (s@searchNormalized==TRUE) {
+			if (s@search.normalized==TRUE) {
 				myFulltext     <- mySR["content.norm"]
 			} else  {
 				myFulltext     <- mySR["content"]
@@ -75,7 +70,7 @@ search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormal
 		
 		if (hit.pos>1)		{
 			#get everything left of the hit
-			leftMargin 	<-	max(0, hit.pos-options()$act.concordanceWidth-1)
+			leftMargin 	<-	max(0, hit.pos-s@concordance.width-1)
 			leftPart  	<- 	substr(myFulltext, leftMargin, hit.pos-1)
 			
 			#regex
@@ -105,7 +100,7 @@ search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormal
 		rightPart 	<- 	""
 		if (hit.pos +  hit.length < nchar(myFulltext) )		{
 			#get everything right of the hit
-			rightMargin <- 	hit.pos +  hit.length + options()$act.concordanceWidth
+			rightMargin <- 	hit.pos +  hit.length + s@concordance.width
 			rightMargin <- 	min(rightMargin, nchar(myFulltext))
 			rightPart 	<- 	substr(myFulltext, hit.pos + hit.length , rightMargin)
 			
@@ -134,7 +129,7 @@ search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormal
 		concHit <- unname(unlist(concHit))
 		
 		#count words
-		if (baseForConcordance=="content") 		{
+		if (s@search.mode=="content") 		{
 			nrWordsLeft <- as.integer(stringi::stri_count_words(leftPart))
 			nrWordsHitPosition <- as.integer(nrWordsLeft + 1)
 			nrWordsHit <- as.integer(stringi::stri_count_words(mySR["hit"]))
@@ -150,15 +145,23 @@ search_concordance <- function(x, s, baseForConcordance="fulltext", searchNormal
 		return(c(concLeft2, concLeft1, concHit, concRight1, concRight2, nrWordsLeft, nrWordsHitPosition, nrWordsHit, nrWordsRight, nrWordsTotal))
 	}
 	
+	conccolnames	  	  <- c("concLeft2", "concLeft1", "concHit", "concRight1", "concRight2", "nrWordsLeft", "nrWordsHitPosition", "nrWordsHit", "nrWordsRight", "nrWordsTotal")
+
+	#remove old concordance
+	mynames <-setdiff(colnames(s@results),conccolnames)
+	temp <- s@results[,mynames]
 	
 	if (nrow(s@results)==0 ) {
 		concs 				  <- data.frame(concLeft2=character(), concLeft1=character(), concHit=character(), concRight1=character(), concRight2=character(), nrWordsLeft=integer(), nrWordsHitPosition=integer(), nrWordsHit=integer(), nrWordsRight=integer(), nrWordsTotal=integer())
 	} else {
-		concs			      <- t(apply(s@results, MARGIN=1, x=x, showProgress=showProgress, search_concordance_single))
+		concs			      <- t(apply(temp, MARGIN=1, x=x, search_concordance_single))
 		concs			      <- data.frame(concs)
-		conccolnames	  	  <- c("concLeft2", "concLeft1", "concHit", "concRight1", "concRight2", "nrWordsLeft", "nrWordsHitPosition", "nrWordsHit", "nrWordsRight", "nrWordsTotal")
 		colnames(concs) 	  <- conccolnames
 	}
-	return(concs)
+
+	#add new concordance
+	s@results <- cbind(temp, concs)
+	
+	return(s)
 }
 

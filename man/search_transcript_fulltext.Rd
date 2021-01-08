@@ -4,14 +4,12 @@
 \alias{search_transcript_fulltext}
 \title{Search in full text of a single transcript}
 \usage{
-search_transcript_fulltext(t, s, showProgress = TRUE)
+search_transcript_fulltext(t, s)
 }
 \arguments{
 \item{t}{Transcript object; transcript to search in.}
 
 \item{s}{Search object.}
-
-\item{showProgress}{Logical; if \code{TRUE} progress bar will be shown.}
 }
 \value{
 Data.frame; data frame with search results.

@@ -4,15 +4,15 @@
 \alias{matrix_load}
 \title{Load replacement matrix}
 \usage{
-matrix_load(path = "", myFileEncoding = "UTF-8")
+matrix_load(path = NULL, myFileEncoding = "UTF-8")
 }
 \arguments{
-\item{path}{Character string; path to the replacement matrix (a CSV file).}
+\item{path}{Character string; path to the replacement matrix (a CSV file). If arguement is left open, the default replacement matrix of the package will be returned.}
 
 \item{myFileEncoding}{Character string; encoding of the file.}
 }
 \value{
-data.frame
+Data.frame
 }
 \description{
 This function is only for checking how the normalization matrix will be loaded internally.
@@ -29,4 +29,7 @@ mymatrix <- act::matrix_load(path)
 # Have a look at the matrix
 colnames(mymatrix)
 mymatrix
+
+#the original path of the matrix is stored in the attributes
+attr(mymatrix, 'path') 
 }

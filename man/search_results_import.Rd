@@ -15,7 +15,7 @@ search_results_import(
 \arguments{
 \item{path}{Character string; path to file from where data will be loaded.}
 
-\item{revertReplacements}{Logical, when exporting search results from act, '=' at the beginning of lines are replaced by '.=", and in numbers the decimal separator '.' is replaced by a ",". If \code{TRUE}, this replacement will be reverted when loading search results.}
+\item{revertReplacements}{Logical, when exporting search results from act, '=' at the beginning of lines are replaced by '.=", and in numbers the decimal separator '.' is replaced by a ",". If \code{TRUE}, this replacement will be reverted when importing search results.}
 
 \item{sheetNameXLSX}{Character string, set the name of the excel sheet containing the data.}
 
@@ -27,7 +27,7 @@ search_results_import(
 Search object.
 }
 \description{
-Search results will be imported from an Excel file ('*.xlsx') CSV file ('*.csv', comma separated values) into a search object.
+Search results will be imported from an Excel '.xlsx' file or a comma separated values '.csv' file into a search object.
 }
 \examples{
 library(act)

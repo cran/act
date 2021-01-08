@@ -23,6 +23,6 @@
 "\x{005E}+";"";"circumflex accent (intonation rise-fall) -> nothing"
 "\x{030C}+";"";"caron (intonation fall-rise) -> nothing"
 "\x{00B0}*\bh+\b\x{00B0}*";"";"breathing -> nothing"
-"\:+";"";"lenghtening -> nothing"
+"\:+";"";"lengthening -> nothing"
 "[\.\;\,\-\?]\W*$";" ";"intonation signs at the end of an utterance -> single space"
 "\s{2,}";" ";"multiple spaces -> single blank space"

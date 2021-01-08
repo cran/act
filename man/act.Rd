@@ -5,7 +5,7 @@
 \alias{act}
 \title{Aligned Corpus Toolkit}
 \description{
-The Aligned Corpus Toolkit (act) is designed for linguists that work with time aligned transcription data. It offers advanced search possibilities in transcriptions (full text search, normalized search, concordance etc.), functions to modify the data, import-export functionality for 'Praat' '\emph{.TextGrid' files, export for 'ELAN' '}.eaf' files, the creation of batch lists for cutting audio and video files with 'FFmpeg', the creation of printable transcripts in the style of conversation analysis, and interaction with 'Praat' using 'Praat'-scripts. The package is itself written in R and may be expanded by other users.
+The Aligned Corpus Toolkit (act) is designed for linguists that work with time aligned transcription data. It offers functions to import and export various annotation file formats ('ELAN' .eaf, 'EXMARaLDA .exb and 'Praat' .TextGrid files), create print transcripts in the style of conversation analysis, search transcripts (span searches across multiple annotations, search in normalized annotations, make concordances etc.), export and re-import search results (.csv and 'Excel' .xlsx format), create cuts for the search results (print transcripts, audio/video cuts using 'FFmpeg' and video sub titles in 'Subrib title' .srt format), modify the data in a corpus (search/replace, delete, filter etc.), interact with 'Praat' using 'Praat'-scripts, and exchange data with the 'rPraat' package. The package is itself written in R and may be expanded by other users.
 }
 \section{act functions}{
 
@@ -14,92 +14,14 @@ The Aligned Corpus Toolkit (act) is designed for linguists that work with time a
 
 \section{Package options}{
 
-There are several options that change the way the package works and that are set globally.
-\itemize{
-\item Use \code{options(name.of.option = value)} to set an option.
-\item Use \code{options()$name.of.option} to get the current value of an option.
-\item Use \code{act::options_reset()} to set all options to the default value.
-\item Use \code{act::options_remove()} to clean up and remove all option settings.
-}
-
-The package uses the following options.
-
-\emph{Paths}
-\itemize{
-\item \code{act.path.praat} Character string; path to the Praat executable on your computer. Only necessary if you use the functions to remote control Praat using Praat scripts.
-\item \code{act.path.sendpraat} Character string; path to the sendpraat executable on your computer. Only necessary if you use the functions to remote control Praat using Praat scripts.
-}
-
-\emph{FFMPEG commands}
-The following options define the ffmpeg command that will be used by the package. The command needs to contain place holders which will be replaced by the actual values in the package. If you want to define your own ffmpeg command, please make sure to use the following placeholders:
-\itemize{
-\item \code{INFILEPATH}  path to the input media file.
-\item \code{OUTFILEPATH} path where the output media file will be saved
-\item \code{OPTIONS} ffmpeg options that will be applied additionally, in particular fast video positioning.
-\item \code{TIMESTART} time in seconds where to begin the cutting
-\item \code{TIMESTARTMINUS10SECONDS} time in seconds where to begin the cutting, in case that fast video positioning is being used.
-\item \code{TIMEDURATION} duration of cut.
-\item \code{act.ffmpeg.command.mp4} Character string; ffmpeg command that is used to cut mp4 files.
-\item \code{act.ffmpeg.command.mp4.FastVideoPostioning} Character string; ffmpeg command that is used to cut mp4 files using the ffmpeg option of fast video positioning.
-\item \code{act.ffmpeg.command.wav} Character string; ffmpeg command that is used to cut wav files.
-\item \code{act.ffmpeg.command.mp3} Character string; ffmpeg command that is used to cut mp3 files.
-\item \code{act.ffmpeg.command.default} Character string; ffmpeg command that is used to cut all other files besides mp4, mp3, and wav.
-\item \code{act.ffmpeg.command.UseFastVideoPostioning} Logical; if \code{TRUE} the ffmpeg option using fast video positioning (ant the respective commands as defined in the other options) will be used.
-}
-
-\emph{Load annotation files}
-\itemize{
-\item \code{act.load.readEmptyIntervals} Logical; if \code{TRUE} empty intervals in you annotation files will be read, if \code{FALSE} empty intervals will be skipped.
-\item \code{act.load.replaceInFilenames.search} Character string; This option is useful if your annotation files contain character sequences that you do not want to include into the transcript name in the corpus (e.g. if you regularly add a date to the file name of your annotations files  as 'myFile_2020-09-21.TextGrid'). This character string is a regular expression Regular expression that will be applied to the file names when loading an annotation file. The hits will be replaced by \code{act.load.replaceInFilenames.replace}.
-\item \code{act.load.replaceInFilenames.replace} Character string; replacement for matches to \code{act.load.replaceInFilenames.search} in file names.
-\item \code{act.load.scanSubfolders} Logical; if \code{TRUE} sub folders will also be scanned for annotation files; if \code{FALSE} only the main level of the folders specified in \code{folders.annotationfiles} of your corpus object will be scanned.
-}
-
-\emph{Export}
-\itemize{
-\item \code{act.export.foldergrouping1.fromColumnName} Character string; Name of sub folders that will be created in the folder of the search result, level 1.
-\item \code{act.export.foldergrouping2.fromColumnName}  Character string; Name of sub folders that will be created in the folder of the search result, level 2.
-\item \code{act.export.filename.fromColumnName}  Character string; Name of the column from which the file names for exported files will be taken.
-\item \code{act.export.filter.tiers.exclude} Character string; regular expression which tiers to EXclude in the exported files.
-\item \code{act.export.filter.tiers.include} Character string; regular expression which tiers to INclude in the exported files.
-}
-
-\emph{Transcript}
-\itemize{
-\item \code{act.transcript.pauseTier.regex} Character string; regular expression to identify pause tier for auto formating pauses.
-\item \code{act.transcript.insertIntoColumn} Character string; name of column destination column in the search results data frame into which context will be inserted; column will be created if not present in data frame; set to "" if for no insertion.
-\item \code{act.transcript.transcript.width} Integer; width of transcript, -1 for no line wrapping.
-\item \code{act.transcript.speaker.width} Integer; width of speaker abbreviation, -1 for full name without shortening.
-\item \code{act.transcript.speaker.ending} Character string; string that is added at the end of the speaker name.
-\item \code{act.transcript.spacesbefore} Integer; number of spaces inserted before line number.
-\item \code{act.transcript.arrow.insert} Logical; if \code{TRUE} an arrow will be inserted, highlighing the transcript line containing the search hit.
-\item \code{act.transcript.arrow.shape} Character string; shape of the arrow.
-\item \code{act.transcript.header.insert} Logical; if \code{TRUE} a transcript header is inserted.
-\item \code{act.transcript.header.heading.fromColumnName} Character string; from which column the heading is taken (if \code{options()$act.transcript.header.insert==TRUE})
-\item \code{act.transcript.header.firstInfo.fromColumnName} Character string; from which column the first info is taken (if \code{options()$act.transcript.header.insert==TRUE})
-\item \code{act.transcript.additionalline1.insert} Logical; if \code{TRUE} an additional dummy line will be inserted after each annotation line, the text is defined in \code{act.transcript.additionalline1.text}.
-\item \code{act.transcript.additionalline1.text} Character string; Content of additional dummy line 1.
-\item \code{act.transcript.additionalline1.indent} Logical; if \code{TRUE} the content of the dummy line 1 will be indented to begin where the content of the annotations start.
-\item \code{act.transcript.additionalline2.insert} Logical; if \code{TRUE} an additional dummy line will be inserted after each annotation line, the text is defined in \code{act.transcript.additionalline2.text}.
-\item \code{act.transcript.additionalline2.text} Character string; Content of additional dummy line 2.
-\item \code{act.transcript.additionalline2.indent} Logical; if \code{TRUE} the content of the dummy line 2 will be indented to begin where the content of the annotations start.
-\item \code{act.transcript.brackets.tryToAlign} Logical; if \code{TRUE} act will try to align brackets [] for parralel speaking (Attention: experimental function; results may not satisfy).
-}
-
-\emph{Miscellaneous}
-\itemize{
-\item \code{act.concordanceWidth} Integer; width of concordance.
-\item \code{act.separator_between_intervals} Character; Single character that is used for separating intervals when creating the full text.
-\item \code{act.separator_between_tiers} Character; Single character that is used for separating tiers when creating the full text.
-\item \code{act.separator_between_words} Character string; regular expression with alternatives that count as separators between words. Used for preparing the concordance.
-\item \code{act.wordCount.regex} Character string; regular expression that is used to count words.
-}
+The package has numerous options that change the internal workings of the package.
+Please see \code{act::options_show} and the information given there.
 }
 
 \examples{
 library(act)
 
-#========== Example data 
+# ========== Example data 
 # The act package comes with some example data. 
 # The data is stored at the following location:
 path <- system.file("extdata", "examplecorpus", package="act")
@@ -130,7 +52,7 @@ download.file(sourceurl, temp)
 unzip(zipfile=temp, exdir=path)
 }
 
-#========== Create a corpus object and load data
+# ========== Create a corpus object and load data
 # Now that we have the example data accessible, we can create a corpus object.
 # The corpus object is a structured collection of all the information that you can 
 # work with using act.
@@ -139,7 +61,7 @@ unzip(zipfile=temp, exdir=path)
 
 # --- Locate folder with annotation files
 # When creating a corpus object you will need to specify where your annotation 
-# files ('Praat' '*.TextGrids') are located.
+# files ('Praat' '.TextGrids' or 'ELAN' .eaf) are located.
 # We will use the example data, that we have just located in 'path'.
 path
 
@@ -151,9 +73,9 @@ path
 # --- Create corpus object and load annotation files
 # The following command will create a corpus object, with the name 'examplecorpus'.
 examplecorpus <- act::corpus_new(
-	corpusname = "examplecorpus",
-	folders_annotationfiles = path,
-	folders_mediafiles = path
+	pathsAnnotationFiles = path,
+	pathsMediaFiles = path,
+	name = "examplecorpus"
 )
 
 # The act package assumes, that annotation files and media files have the same base  
@@ -165,21 +87,22 @@ examplecorpus <- act::corpus_new(
 # The following command will give you a summary of the data contained in your corpus object.
 examplecorpus
 # More detailed information about the transcripts in your corpus object is available by 
-# calling the function corpus_overview()
-corpus_overview(examplecorpus)
+# calling the function act::info()
+act::info(examplecorpus)
 # If you are working in R studio, a nice way of inspecting this information is the following:
 \dontrun{
-	View(corpus_overview(examplecorpus))
+	View(act::info(examplecorpus)$transcripts)
+	View(act::info(examplecorpus)$tiers)
 }
 
-#========== all data
+# ========== all data
 # You can also get all data that is in the loaded annotation files in a data frame:
-alldata <- act::corpus_alldata(examplecorpus)
+all_annotations <- act::annotations_all(examplecorpus)
 \dontrun{
-	View(alldata)
+	View(all_annotations)
 }
 
-#========== Search
+# ========== Search
 # Let's do some searches in the data.
 # Search for the 1. Person Singular Pronoun in Spanish 'yo' in the examplecorpus
 mysearch <- act::search_new(x=examplecorpus, 
@@ -198,7 +121,7 @@ mysearch
 # Let's compare the two modes.
 mysearch.norm  <- act::search_new(examplecorpus, pattern="yo", searchNormalized=TRUE)
 mysearch.org   <- act::search_new(examplecorpus, pattern="yo", searchNormalized=FALSE)
-#There is a difference in the number of results.
+# There is a difference in the number of results.
 mysearch.norm@results.nr
 mysearch.org@results.nr
 

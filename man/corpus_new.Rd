@@ -2,29 +2,72 @@
 % Please edit documentation in R/corpus_new.R
 \name{corpus_new}
 \alias{corpus_new}
-\title{Create a new corpus}
+\title{Create a new corpus object}
 \usage{
 corpus_new(
-  corpusname,
-  folders_annotationfiles,
-  folders_mediafiles,
-  loadFiles = TRUE
+  pathsAnnotationFiles,
+  pathsMediaFiles = NULL,
+  name = "New Corpus",
+  importFiles = TRUE,
+  skipDoubleFiles = TRUE,
+  createFullText = TRUE,
+  assignMedia = TRUE,
+  pathNormalizationMatrix = NULL,
+  namesSearchPatterns = character(),
+  namesSearchReplacements = character(),
+  namesToUpperCase = FALSE,
+  namesToLowerCase = FALSE,
+  namesTrim = TRUE,
+  namesDefaultForEmptyNames = "no_name"
 )
 }
 \arguments{
-\item{corpusname}{Character string; name of the corpus to be created.}
+\item{pathsAnnotationFiles}{Vector of character strings; paths to annotations files or folders that contain annotation files.}
 
-\item{folders_annotationfiles}{Vector of character strings; paths to folders that contain annotation files.}
+\item{pathsMediaFiles}{Vector of character strings; paths to media files or folders that contain media files.}
 
-\item{folders_mediafiles}{Vector of character strings; paths to folders that contain media files.}
+\item{name}{Character string; name of the corpus to be created.}
 
-\item{loadFiles}{Logical; if \code{TRUE} annotation files will be loaded immediately when the function is called, if \code{FALSE} corpus object will be created without loading the annotation files.}
+\item{importFiles}{Logical; if \code{TRUE} annotation files will be imported immediately when the function is called, if \code{FALSE} corpus object will be created without importing the annotation files.}
+
+\item{skipDoubleFiles}{Logical; if \code{TRUE} transcripts with the same names will be skipped (only one of them will be added), if \code{FALSE} transcripts will be renamed to make the names unique.}
+
+\item{createFullText}{Logical; if \code{TRUE} full text will be created.}
+
+\item{assignMedia}{Logical; if \code{TRUE} the folder(s) specified in \code{@paths.media.files} of your corpus object will be scanned for media.}
+
+\item{pathNormalizationMatrix}{Character string; path to the replacement matrix used for normalizing the annotations; if argument left open, the default normalization matrix of the package will be used.}
+
+\item{namesSearchPatterns}{Vector of character strings; Search pattern as regular expression. Leave empty for no search-replace in the names.}
+
+\item{namesSearchReplacements}{Vector of character strings; Replacements for search. Leave empty for no search-replace in the names.}
+
+\item{namesToUpperCase}{Logical; Convert transcript names all to upper case.}
+
+\item{namesToLowerCase}{Logical; Convert transcript names all to lower case.}
+
+\item{namesTrim}{Logical; Remove leading and trailing spaces in names.}
+
+\item{namesDefaultForEmptyNames}{Character string; Default value for empty transcript names (e.g., resulting from search-replace operations)}
 }
 \value{
 Corpus object.
 }
 \description{
-Create a new corpus
+Create a new corpus object and loads annotation files. Currently 'ELAN' .eaf, 'EXMARaLDA .exb and 'Praat' .TextGrid files are supported.
+ 
+The parameter \code{pathsAnnotationFiles} defines where the annotation files are located.
+If \code{skipDoubleFiles=TRUE} duplicated files will be skipped, otherwise the will be renamed.
+If \code{importFiles=TRUE} the corpus object will be created but files will not be loaded. To load the files then call \link{corpus_import}.
+}
+\details{
+The parameter \code{pathsMediaFiles} defines where the corresponding media files are located.
+If \code{assignMedia=TRUE} the paths defined in \code{x@paths.media.files} will be scanned for media files and will be matched to the transcript object based on their names.
+Only the the file types set in \code{options()$act.fileformats.audio} and \code{options()$act.fileformats.video} will be recognized. 
+You can modify these options to recognize other media types.
+
+See \code{@import.results} of the corpus object to check the results of importing the files.
+To get a detailed overview of the corpus object use \code{act::info(x)}, for a summary use \code{act::info_summarized(x)}.
 }
 \examples{
 library(act)
@@ -43,14 +86,14 @@ path <- system.file("extdata", "examplecorpus", package="act")
 }
 
 # The following command creates a new corpus object
-mycorpus <- act::corpus_new(corpusname = "mycorpus",
-                            folders_annotationfiles = path,
-                            folders_mediafiles = path)
+mycorpus <- act::corpus_new(name = "mycorpus",
+	pathsAnnotationFiles = path,
+	pathsMediaFiles = path)
 
 # Get a summary
 mycorpus
 
 }
 \seealso{
-\link{corpus_load}, \link{examplecorpus}
+\link{corpus_import}, \link{examplecorpus}
 }

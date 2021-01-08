@@ -5,6 +5,7 @@ library(act)
 mysearch <- act::search_new(x=examplecorpus, pattern= "yo", runSearch=FALSE)
 
 # Run the search
+
 df <- act::search_transcript_content(t=examplecorpus@transcripts[[3]],
-                                     s=mysearch)
+s=mysearch)
 nrow(df)

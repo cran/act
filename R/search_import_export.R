@@ -7,7 +7,7 @@
 #' - In the case of writing to an excel file, line breaks will be replaced by "|". This is because line breaks will lead to an error.
 #' 
 #' @param s Search object. Search object containing the results you wish to export.
-#' @param path Character string; path where file will be saved. Please add the suffix '*.csv' or '*.xlsx' to the filename.
+#' @param path Character string; path where file will be saved. Please add the suffix '.csv' or '.xlsx' to the file name.
 #' @param sheetNameXLSX Character string, set the name of the excel sheet.
 #' @param saveAsCSV Logical; if \code{TRUE} results will be saved as CSV file; Logical; if \code{FALSE} a XLS file will be saved.
 #' @param encodingCSV Character string; text encoding for CSV files.
@@ -18,9 +18,11 @@
 #' @example inst/examples/search_import_export.R
 #' 
 search_results_export <- function(s, path, sheetNameXLSX="data", saveAsCSV=FALSE, encodingCSV="UTF-8", separatorCSV=",") {
+	if (missing(s)) 	{stop("Search object in parameter 's' is missing.") 		} else { if (class(s)[[1]]!="search")		{stop("Parameter 's' needs to be a search object.") 	} }
+	
 	#check colnames
 	mycolnames <- colnames(s@results)
-	necessarycolnames <- c("resultID", "dataID", "transcriptName", "tierName", "startSec", "endSec", "content", "content.norm", "hit", "hit.nr", "hit.length", "hit.pos.content", "hit.pos.fulltext", "searchMode", "hit.span")
+	necessarycolnames <- c("resultID", "transcript.name", "annotationID",  "tier.name", "startSec", "endSec", "content", "content.norm", "hit", "hit.nr", "hit.length", "hit.pos.content", "hit.pos.fulltext", "search.mode", "hit.span")
 	missingcolnames <- necessarycolnames[!necessarycolnames %in% mycolnames]
 	if (length(missingcolnames>0)) {
 		stop(	stringr::str_c(c("Some necessary columns are missing in the data frame '@results' in your search object. Missing columns: ", missingcolnames), sep="", collapse=" "))
@@ -31,7 +33,7 @@ search_results_export <- function(s, path, sheetNameXLSX="data", saveAsCSV=FALSE
 	s@results$endSec		<-	gsub("\\.", ",", s@results$endSec) 
 
 	#replace = at he beginning of cells
-	searchString<-"^="
+	searchString <-"^="
 	replacementString <- ".="
 	s@results$content		<-	stringr::str_replace_all(s@results$content, searchString, replacementString )
 	s@results$content.norm	<-	stringr::str_replace_all(s@results$content.norm,searchString, replacementString)	
@@ -41,16 +43,17 @@ search_results_export <- function(s, path, sheetNameXLSX="data", saveAsCSV=FALSE
 	s@results$concHit		<-	stringr::str_replace_all(s@results$concHit, searchString, replacementString )
 	s@results$concRight1	<-	stringr::str_replace_all(s@results$concRight1, searchString, replacementString )
 	s@results$concRight2	<-	stringr::str_replace_all(s@results$concRight2, searchString, replacementString )
-	s@results$transcript	<-	stringr::str_replace_all(s@results$transcript, searchString, replacementString )
+	if ("printtranscript" %in% mycolnames) {
+		s@results$transcript	<-	stringr::str_replace_all(s@results$printtranscript, searchString, replacementString )
+	}
 	
 
 
 	#write
 	if (saveAsCSV) {
-		utils::write.table(s@results, file = path, sep = separatorCSV, col.names = mycolnames, row.names=FALSE, qmethod = "double", fileEncoding= encodingCSV)
+		utils::write.table(s@results, file = path, sep = separatorCSV, col.names = colnames(s@results), row.names=FALSE, qmethod = "double", fileEncoding= encodingCSV)
 	} else {
-			#WriteXLS::WriteXLS(s@results, ExcelFileName = path)#, AdjWidth=TRUE ,verbose=FALSE )
-			openxlsx::write.xlsx(s@results, file=path, sheetName="data")
+		openxlsx::write.xlsx(s@results, file=path, sheetName="data")
 	}
 }
 
@@ -60,10 +63,10 @@ search_results_export <- function(s, path, sheetNameXLSX="data", saveAsCSV=FALSE
 
 #' Import search results 
 #' 
-#' Search results will be imported from an Excel file ('*.xlsx') CSV file ('*.csv', comma separated values) into a search object.
+#' Search results will be imported from an Excel '.xlsx' file or a comma separated values '.csv' file into a search object.
 #'
 #' @param path Character string; path to file from where data will be loaded.
-#' @param revertReplacements Logical, when exporting search results from act, '=' at the beginning of lines are replaced by '.=", and in numbers the decimal separator '.' is replaced by a ",". If \code{TRUE}, this replacement will be reverted when loading search results.
+#' @param revertReplacements Logical, when exporting search results from act, '=' at the beginning of lines are replaced by '.=", and in numbers the decimal separator '.' is replaced by a ",". If \code{TRUE}, this replacement will be reverted when importing search results.
 #' @param sheetNameXLSX Character string, set the name of the excel sheet containing the data.
 #' @param encodingCSV Character string; text encoding in the case of CVS files.
 #' @param separatorCSV Character; single character that is used to separate the columns in CSV files.
@@ -74,7 +77,12 @@ search_results_export <- function(s, path, sheetNameXLSX="data", saveAsCSV=FALSE
 #'
 #' @example inst/examples/search_import_export.R
 #' 
-search_results_import <- function(path, revertReplacements=TRUE, sheetNameXLSX="data", encodingCSV="UTF-8", separatorCSV=",") {
+search_results_import <- function(path, 
+								  revertReplacements=TRUE,
+								  sheetNameXLSX="data", 
+								  encodingCSV="UTF-8", 
+								  separatorCSV=",") {
+	
 	filetype <- tools::file_ext(path)
 	if (filetype=="csv") {
 		temp <- utils::read.table(path, header = TRUE, sep = separatorCSV, fileEncoding = encodingCSV, encoding=encodingCSV )
@@ -82,12 +90,12 @@ search_results_import <- function(path, revertReplacements=TRUE, sheetNameXLSX="
 			rownames(temp)<-temp$resultID
 		}
 	} else {
-		temp<-openxlsx::read.xlsx(xlsxFile=path, sheet=sheetNameXLSX)
+		temp <-openxlsx::read.xlsx(xlsxFile=path, sheet=sheetNameXLSX)
 	}
 	
 	#check colnames
-	necessarycolnames <- c("resultID", "dataID", "transcriptName", "tierName", "startSec", "endSec", "content", "content.norm", "hit", "hit.nr", "hit.length", "hit.pos.content", "hit.pos.fulltext", "searchMode", "hit.span")
-	mycolnames<-colnames(temp)
+	necessarycolnames <- c("resultID", "transcript.name", "annotationID",  "tier.name", "startSec", "endSec", "content", "content.norm", "hit", "hit.nr", "hit.length", "hit.pos.content", "hit.pos.fulltext", "search.mode", "hit.span")
+	mycolnames <-colnames(temp)
 	missingcolnames <- necessarycolnames[!necessarycolnames %in% mycolnames]
 	if (length(missingcolnames>0)) {
 		stop(	stringr::str_c(c("Some necessary columns are missing in your input file'. Missing columns: ", missingcolnames), sep="", collapse=" "))
@@ -99,7 +107,7 @@ search_results_import <- function(path, revertReplacements=TRUE, sheetNameXLSX="
 		temp$endSec		<-	gsub(",", "\\.", temp$endSec) 
 		
 		#replace = at he beginning of cells
-		searchString<-"^\\.="
+		searchString <-"^\\.="
 		replacementString <- "="
 		temp$content		<-	stringr::str_replace_all(temp$content, searchString, replacementString )
 		temp$content.norm	<-	stringr::str_replace_all(temp$content.norm,searchString, replacementString)	
@@ -120,7 +128,7 @@ search_results_import <- function(path, revertReplacements=TRUE, sheetNameXLSX="
 	temp$startSec				<- as.double(temp$startSec)
 	temp$endSec					<- as.double(temp$endSec)
 	
-	temp$dataID					<- as.integer(temp$dataID)
+	temp$annotationID					<- as.integer(temp$annotationID)
 	temp$hit.length				<- as.integer(temp$hit.length)
 	temp$hit.nr					<- as.integer(temp$hit.nr)
 	temp$hit.pos.content		<- as.integer(temp$hit.pos.content)
@@ -133,14 +141,14 @@ search_results_import <- function(path, revertReplacements=TRUE, sheetNameXLSX="
 	#Create a search object
 	s <- methods::new("search")
 	#s@pattern                   <- pattern
-	#s@searchMode                <- searchMode
-	#s@searchNormalized          <- searchNormalized
-	#s@startSec                  <- if(!is.na(startSec)) {if(!is.null(startSec)) {startSec}} else {s@startSec}
-	#s@endSec                    <- if(!is.na(endSec))   {if(!is.null(endSec))   {endSec}}   else {s@endSec}
-	#s@filter.tiers.include      <- ""
-	#s@filter.tiers.exclude      <- ""
-	#s@filter.transcripts.include<- if(!is.na(filterTranscriptsInclude))   {if(!is.null(filterTranscriptsInclude))   {filterTranscriptsInclude}}   else {s@filter.transcripts.include}
-	#s@filter.transcripts.exclude<- if(!is.na(filterTranscriptsExclude))   {if(!is.null(filterTranscriptsExclude))   {filterTranscriptsExclude}}   else {s@filter.transcripts.exclude}
+	#s@search.mode                <- searchMode
+	#s@search.normalized          <- searchNormalized
+	#s@filter.section.startsec                  <- if(!is.na(startSec)) {if(!is.null(startSec)) {startSec}} else {s@filter.section.startsec}
+	#s@filter.section.endsec                    <- if(!is.na(endSec))   {if(!is.null(endSec))   {endSec}}   else {s@filter.section.endsec}
+	#s@filter.tier.include      <- ""
+	#s@filter.tier.exclude      <- ""
+	#s@filter.transcript.include <- if(!is.na(filterTranscriptInclude))   {if(!is.null(filterTranscriptInclude))   {filterTranscriptInclude}}   else {s@filter.transcript.include}
+	#s@filter.transcript.exclude <- if(!is.na(filterTranscriptExclude))   {if(!is.null(filterTranscriptExclude))   {filterTranscriptExclude}}   else {s@filter.transcript.exclude}
 	s@results <- temp
 	
 	return(s)

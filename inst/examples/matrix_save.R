@@ -6,7 +6,7 @@ path <- system.file("extdata", "normalization", "normalizationMatrix.csv", packa
 # Load the matrix
 mymatrix <- act::matrix_load(path)
 
-#' #Create temporary file path
+# ' # Create temporary file path
 path <- tempfile(pattern = "mymatrix", tmpdir=tempdir(),  fileext = ".csv")
 
 # It makes more sense, however, to you define a destination folder

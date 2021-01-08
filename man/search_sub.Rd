@@ -8,10 +8,10 @@ search_sub(
   x,
   s,
   pattern,
-  filterTiersInclude = "",
-  filterTiersExclude = "",
+  filterTierInclude = "",
+  filterTierExclude = "",
   destinationColumn = "subsearch",
-  removeLinesWithNoResults = FALSE,
+  deleteLinesWithNoResults = FALSE,
   excludeHitsWithinSameTier = TRUE
 )
 }
@@ -22,13 +22,13 @@ search_sub(
 
 \item{pattern}{Character string; search pattern as regular expression}
 
-\item{filterTiersInclude}{Character string; limit search to tiers that match the regular expression}
+\item{filterTierInclude}{Character string; limit search to tiers that match the regular expression}
 
-\item{filterTiersExclude}{Character string; limit search to tiers that match the regular expression}
+\item{filterTierExclude}{Character string; limit search to tiers that match the regular expression}
 
 \item{destinationColumn}{Character string; name of column where results of sub search will be stored}
 
-\item{removeLinesWithNoResults}{Logical; if \code{TRUE} search results will be removed for which the sub search does not give any results}
+\item{deleteLinesWithNoResults}{Logical; if \code{TRUE} search results will be deleted for which the sub search does not give any results}
 
 \item{excludeHitsWithinSameTier}{Logical; if \code{TRUE} the function will not add hits from the same tier as the original search result; if \code{FALSE} hits from the same tier as the original search result will be included.}
 }
@@ -60,4 +60,7 @@ test <- act::search_sub(x=examplecorpus,
 
 # Check the co-occurring search hits
 test$subsearch
+}
+\seealso{
+\link{search_new}, \link{search_run}, \link{search_meta}
 }

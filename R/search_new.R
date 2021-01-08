@@ -4,28 +4,54 @@
 #' Only 'x' and 'pattern' are obligatory. 
 #' The other arguments can be left to their default values.
 #'
-#' @param x Corpus object.
+#' @param x Corpus object; basis in which will be searched.
 #' @param pattern Character string; search pattern as regular expression.
-#' @param searchMode Character string; takes the following values: content, fulltext (=default, includes both fulltext modes ), fulltext.byTime, fulltext.byTier.
+#' @param searchMode Character string; takes the following values: \code{content}, \code{fulltext} (=default, includes both full text modes), \code{fulltext.byTime}, \code{fulltext.byTier}.
 #' @param searchNormalized Logical; if \code{TRUE} function will search in the normalized content, if \code{FALSE} function will search in the original content.
-#' @param makeConcordance Logical; if \code{TRUE} concordance will be added to search results.
-#' @param prefix Character string; prefix for the name of the consecutively numbered search results.
-#' @param filterTranscriptsInclude Character string; as regular expression, limit search to certain transcripts matching the expression.
-#' @param filterTranscriptsExclude Character string; as regular expression, exclude certain transcripts matching the expression.
-#' @param filterTiersInclude Character string; as regular expression, limit search to certain tiers matching the expression.
-#' @param filterTiersExclude Character string; as regular expression, exclude certain tiers matching the expression.
-#' @param startSec Double; start time of region for search.
-#' @param endSec Double; end time of region for search. 
+#' @param name Character string; name of the search. Will be used, for example, as name of the sub folder when creating media cuts.
+#' @param resultidprefix Character string; prefix for the name of the consecutively numbered search results.
+#' @param filterTranscriptNames Vector of character strings; names of transcripts to be included. 
+#' @param filterTranscriptInclude Character string; as regular expression, limit search to certain transcripts matching the expression.
+#' @param filterTranscriptExclude Character string; as regular expression, exclude certain transcripts matching the expression.
+#' @param filterTierNames Vector of character strings; names of tiers to be included. 
+#' @param filterTierInclude Character string; as regular expression, limit search to certain tiers matching the expression.
+#' @param filterTierExclude Character string; as regular expression, exclude certain tiers matching the expression.
+#' @param filterSectionStartsec Double; start time of region for search.
+#' @param filterSectionEndsec Double; end time of region for search. 
+#' @param concordanceMake Logical; if \code{TRUE} concordance will be added to search results.
+#' @param concordanceWidth Integer; number of characters  to the left and right of the search hit in the concordance , the default is \code{120}.
+#' @param cutSpanBeforesec Double; Start the media and transcript cut some seconds before the hit to include some context, the default is \code{0}.
+#' @param cutSpanAftersec Double; End the media and transcript cut some seconds before the hit to include some context, the default is \code{0}.
 #' @param runSearch Logical; if \code{TRUE} search will be run in corpus object, if \code{FALSE} only the search object will be created.
-#' @param showProgress Logical; if \code{TRUE} progress bar will be shown.
-#' @param updateX Logical; If \code{TRUE} the original corpus object passed as x to the function will also be updated! If you do not want this, set to \code{FALSE}. 
 #' 
 #' @return Search object.
+#' 
+#' @seealso \link{search_run}, \link{search_meta}, \link{search_sub}
+#' 
 #' @export
 #'
 #' @example inst/examples/search_new.R
 #' 
-search_new <- function(x, pattern, searchMode="fulltext", searchNormalized=TRUE, filterTranscriptsInclude=NA, filterTranscriptsExclude=NA, filterTiersInclude=NA, filterTiersExclude=NA, startSec=NA, endSec=NA,  makeConcordance=TRUE, prefix="result", runSearch=TRUE, showProgress=TRUE, updateX=TRUE) {
+search_new <- function(x, 
+					   pattern, 
+					   searchMode=c("content", "fulltext", "fulltext.byTime", "fulltext.byTier"),
+					   searchNormalized=TRUE, 
+					   name="mysearch",  
+					   resultidprefix="result", 
+					   filterTranscriptNames=NULL,
+					   filterTranscriptInclude=NULL, 
+					   filterTranscriptExclude=NULL, 
+					   filterTierNames=NULL,
+					   filterTierInclude=NULL, 
+					   filterTierExclude=NULL, 
+					   filterSectionStartsec=NULL, 
+					   filterSectionEndsec=NULL,  
+					   concordanceMake=TRUE, 
+					   concordanceWidth=NULL,
+					   cutSpanBeforesec =0,
+					   cutSpanAftersec =0,
+					   runSearch=TRUE) {
+	
 	#=== capture original x
 	captured_x <- substitute(x)
 	original_x <- x
@@ -33,29 +59,40 @@ search_new <- function(x, pattern, searchMode="fulltext", searchNormalized=TRUE,
 	start.time <- Sys.time()
 
 	#=== check x object
-	if (is.null(x)) 				{	stop("Corpus object x is null.")					}
-	if (is.null(x@transcripts)) 	{	stop("No transcripts found in corpus object x.")	}
-	if (is.null(pattern)) 	        {	stop("Search pattern x is null.")					}
 	
+	if (missing(x))             	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
+	if (missing(pattern))			{stop("Pattern is missing.") 	}
+	if (is.null(x@transcripts)) 	{stop("No transcripts found in corpus object x.")	}
+
+	#=== check arguments
+	searchMode <-match.arg(searchMode)
+
 	#=== create search object
 	s <- methods::new("search")
+	s@name          			<- name
 	s@pattern                   <- pattern
-	s@searchMode                <- searchMode
-	s@searchNormalized          <- searchNormalized
-	s@startSec                  <- if(!is.na(startSec)) {if(!is.null(startSec)) {startSec}} else {s@startSec}
-	s@endSec                    <- if(!is.na(endSec))   {if(!is.null(endSec))   {endSec}}   else {s@endSec}
-	s@filter.transcripts.include<- if(!is.na(filterTranscriptsInclude))   {if(!is.null(filterTranscriptsInclude))   {filterTranscriptsInclude}}   else {s@filter.transcripts.include}
-	s@filter.transcripts.exclude<- if(!is.na(filterTranscriptsExclude))   {if(!is.null(filterTranscriptsExclude))   {filterTranscriptsExclude}}   else {s@filter.transcripts.exclude}
-	s@filter.tiers.include      <- if(!is.na(filterTiersInclude))   {if(!is.null(filterTiersInclude))   {filterTiersInclude}}   else {s@filter.transcripts.include}
-	s@filter.tiers.exclude      <- if(!is.na(filterTiersExclude))   {if(!is.null(filterTiersExclude))   {filterTiersExclude}}   else {s@filter.transcripts.exclude}
+	s@search.mode               <- searchMode
+	s@search.normalized         <- searchNormalized
+	s@resultidprefix            <- resultidprefix
 	
-	#s@cutlist.mac               <- 
-	#s@cutlist.win               <- 
+	s@filter.transcript.names   <- if(!is.null(filterTranscriptNames))     {filterTranscriptNames}     else {s@filter.transcript.names}
+	s@filter.transcript.include <- if(!is.null(filterTranscriptInclude))   {filterTranscriptInclude}   else {s@filter.transcript.include}
+	s@filter.transcript.exclude <- if(!is.null(filterTranscriptExclude))   {filterTranscriptExclude}   else {s@filter.transcript.exclude}
+	s@filter.transcript.names   <- if(!is.null(filterTierNames))           {filterTierNames}           else {s@filter.tier.names}
+	s@filter.tier.include       <- if(!is.null(filterTierInclude))         {filterTierInclude}         else {s@filter.tier.include}
+	s@filter.tier.exclude       <- if(!is.null(filterTierExclude))         {filterTierExclude}         else {s@filter.tier.exclude}
+	s@filter.section.startsec   <- if(!is.null(filterSectionStartsec))     {filterSectionStartsec}     else {s@filter.section.startsec}
+	s@filter.section.endsec     <- if(!is.null(filterSectionEndsec))       {filterSectionEndsec}       else {s@filter.section.endsec}
+	s@concordance.make          <- concordanceMake
+	s@concordance.width         <- if(!is.null(concordanceWidth))   {concordanceWidth}   else {s@concordance.width}
+	s@cuts.span.beforesec       <- cutSpanBeforesec
+	s@cuts.span.aftersec        <- cutSpanAftersec	
 	
-	s@corpus                    <- x@name
-	s@makeConcordance           <- makeConcordance
-	s@prefix                    <- prefix
+	#s@cuts.cutlist.mac               <- 
+	#s@cuts.cutlist.win               <- 
 	
+	s@x.name                     <- x@name
+
 	#s@results                   <- 
 	#s@results.nr                <- 
 	#s@results.tiers.nr          <- 
@@ -63,13 +100,12 @@ search_new <- function(x, pattern, searchMode="fulltext", searchNormalized=TRUE,
 
 	#=== run the search
 	if (runSearch) {
-		s <- act::search_run(x=x, s=s, showProgress=TRUE)
+		s <- act::search_run(x=x, s=s)
 	}
 
-	#if corpus object has changed
-	if (!identical(original_x,x)) {
-		#assign to original corpus object
-		if (updateX) {
+	#if corpus object has changed, assign to original corpus object
+	if (getOption("act.updateX", TRUE)) {
+		if (!identical(original_x,x)) {
 			p <- parent.frame() 
 			p[[deparse(captured_x)]] <- x
 		}	

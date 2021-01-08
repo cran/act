@@ -2,24 +2,18 @@
 #'
 #' @param t Transcript object; transcript to search in.
 #' @param s Search object.
-#' @param showProgress Logical; if \code{TRUE} progress bar will be shown.
 #' 
 #' @return Data.frame; data frame with search results.
 #' 
 #'   
 #' # @example inst/examples/search_transcript_fulltext.R
 #' 
-search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
-	if (is.null(t)) 				{	stop("Transcript object is null.")		}
+search_transcript_fulltext <- function(t, s) {
+	if (missing(t)) 	{stop("Transcript object in parameter 't' is missing.") 	} else { if (class(t)[[1]]!="transcript") 	{stop("Parameter 't' needs to be a transcript object.") 	} }
+	if (missing(s)) 	{stop("Search object in parameter 's' is missing.") 		} else { if (class(s)[[1]]!="search")		{stop("Parameter 's' needs to be a search object.") 	} }
 	
 	#progress
-	if (showProgress)		{	
-		if (exists("act.environment", mode="environment")) {
-			if(exists("pb", envir=act.environment)) {
-				act.environment$pb$tick()
-			}
-		}
-	}
+	helper_progress_tick()
 	
 	mySearchResults 	 	<- NULL
 	mySearchResults.byTime	<- NULL
@@ -28,8 +22,8 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 	#== helper function: get the numbers of the record set where the hit starts
 	getRecordsetForHit <- function(hit.length, start, end)	{
 		#compare the position of the match with the cummulated positions 	= where the recordset ENDS in the big text
-		# start <- myData$char.norm.bytime.start
-		# end <- myData$char.norm.bytime.end
+		# start <- myAnnotations$char.norm.bytime.start
+		# end <- myAnnotations$char.norm.bytime.end
 		# XXX XXX min(which(hit.length<end))
 		
 		#this gives an arror for hits that are length==1
@@ -49,7 +43,7 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 			#check if separator ist not at the beginning of the hit
 			results <- as.data.frame(stringr::str_locate_all(myhit, stringr::fixed(p)))
 			
-			#get rid of sepearators at the beginning
+			#get rid of separators at the beginning
 			results <- results[!(results$start==1),]
 			
 			#get rid of separators at the end
@@ -82,9 +76,9 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 	}
 	
 	#================================ By TIME
-	if (s@searchMode=="fulltext" | s@searchMode=="fulltext.byTime") {
+	if (s@search.mode=="fulltext" | s@search.mode=="fulltext.byTime") {
 		#=== get full text
-		if (s@searchNormalized==TRUE)  {
+		if (s@search.normalized==TRUE)  {
 			myFulltext <- t@fulltext.bytime.norm
 		} else {
 			myFulltext <- t@fulltext.bytime.orig
@@ -109,16 +103,16 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 				hit.nr		  		<-	c(1:length(hit))
 				hit.pos.fulltext	<- 	data.frame(stringr::str_locate_all(myFulltext, s@pattern))$start
 				
-				#=== get original data
-				myData <- t@data
+				#=== get original annotations
+				myAnnotations <- t@annotations
 				
-				if (s@searchNormalized==TRUE) 	{
+				if (s@search.normalized==TRUE) 	{
 					#calculate the interval that contains the hit
-					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myData$char.norm.bytime.start, end = myData$char.norm.bytime.end)
+					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myAnnotations$char.norm.bytime.start, end = myAnnotations$char.norm.bytime.end)
 					
 					#select the recordsets that contain the match
-					mySearchResults.byTime 	<-	myData[matches.recordsetNrs,]
-					rm(myData)
+					mySearchResults.byTime 	<-	myAnnotations[matches.recordsetNrs,]
+					rm(myAnnotations)
 					
 					# calculate position start of hit in content
 					hit.pos.content <- hit.pos.fulltext - mySearchResults.byTime$char.norm.bytime.start + 1
@@ -127,11 +121,11 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 					hit.pos.content <- hit.pos.content - (mySearchResults.byTime$char.norm.bytime.end - mySearchResults.byTime$char.norm.bytime.start - nchar(mySearchResults.byTime$content.norm) + 1)
 				} else {
 					#calculate the interval that contains the hit
-					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myData$char.orig.bytime.start, end = myData$char.orig.bytime.end)
+					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myAnnotations$char.orig.bytime.start, end = myAnnotations$char.orig.bytime.end)
 					
 					#select the recordsets that contain the match
-					mySearchResults.byTime 	<-	myData[matches.recordsetNrs,]
-					rm(myData)
+					mySearchResults.byTime 	<-	myAnnotations[matches.recordsetNrs,]
+					rm(myAnnotations)
 					
 					#calculate position start of hit in content
 					hit.pos.content <- hit.pos.fulltext - mySearchResults.byTime$char.orig.bytime.start + 1
@@ -145,16 +139,16 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 				hit.span 			<- unlist(lapply(hit, detectHitSpan))
 				
 				#=== add further columns
-				mySearchResults.byTime 	<-	cbind(mySearchResults.byTime, hit, hit.nr, hit.length, hit.pos.fulltext, hit.pos.content, searchMode="byTime", hit.span=hit.span)
+				mySearchResults.byTime 	<-	cbind(mySearchResults.byTime, hit, hit.nr, hit.length, hit.pos.fulltext, hit.pos.content, search.mode="byTime", hit.span=hit.span)
 				rowNumbers				<-	row.names(mySearchResults.byTime)
 			}
 		}
 	}
 	
 	#================================ By TIER
-	if (s@searchMode=="fulltext" | s@searchMode=="fulltext.byTier") {
+	if (s@search.mode=="fulltext" | s@search.mode=="fulltext.byTier") {
 		#=== get full text
-		if (s@searchNormalized==TRUE)  {
+		if (s@search.normalized==TRUE)  {
 			myFulltext <- t@fulltext.bytier.norm
 		} else {
 			myFulltext <- t@fulltext.bytier.orig
@@ -179,16 +173,16 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 				hit.nr		  		<-	c(1:length(hit))
 				hit.pos.fulltext	<- 	data.frame(stringr::str_locate_all(myFulltext, s@pattern))$start
 				
-				#=== get original data
-				myData <- t@data
+				#=== get original annotations
+				myAnnotations <- t@annotations
 				
-				if (s@searchNormalized==TRUE) 	{
+				if (s@search.normalized==TRUE) 	{
 					#calculate the interval that contains the hit
-					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myData$char.norm.bytier.start, end = myData$char.norm.bytier.end)
+					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myAnnotations$char.norm.bytier.start, end = myAnnotations$char.norm.bytier.end)
 					
-					#select the recordsets that contain the match
-					mySearchResults.byTier 	<-	myData[matches.recordsetNrs,]
-					rm(myData)
+					#select the record sets that contain the match
+					mySearchResults.byTier 	<-	myAnnotations[matches.recordsetNrs,]
+					rm(myAnnotations)
 					
 					#calculate position start of hit in content
 					hit.pos.content <- hit.pos.fulltext - mySearchResults.byTier$char.norm.bytier.start + 1
@@ -198,11 +192,11 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 					
 				} else {
 					#calculate the interval that contains the hit
-					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myData$char.orig.bytier.start, end = myData$char.orig.bytier.end)
+					matches.recordsetNrs <- sapply(hit.pos.fulltext, getRecordsetForHit, start = myAnnotations$char.orig.bytier.start, end = myAnnotations$char.orig.bytier.end)
 					
 					#select the recordsets that contain the match
-					mySearchResults.byTier 	<-	myData[matches.recordsetNrs,]
-					rm(myData)
+					mySearchResults.byTier 	<-	myAnnotations[matches.recordsetNrs,]
+					rm(myAnnotations)
 					
 					#calculate position start of hit in content
 					hit.pos.content <- hit.pos.fulltext - mySearchResults.byTier$char.orig.bytier.start + 1
@@ -215,11 +209,11 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 				hit.span 	<- unlist(lapply(hit, detectHitSpan))
 				
 				#=== add further columns
-				mySearchResults.byTier 	<-	cbind(mySearchResults.byTier, hit, hit.nr, hit.length, hit.pos.fulltext, hit.pos.content, searchMode="byTier", hit.span=hit.span)
+				mySearchResults.byTier 	<-	cbind(mySearchResults.byTier, hit, hit.nr, hit.length, hit.pos.fulltext, hit.pos.content, search.mode="byTier", hit.span=hit.span)
 				rowNumbers				<-	row.names(mySearchResults.byTier)
 				
 				#=== delete results that are across tiers
-				mySearchResults.byTier<- mySearchResults.byTier[mySearchResults.byTier$hit.span!="across tiers", ]
+				mySearchResults.byTier <- mySearchResults.byTier[mySearchResults.byTier$hit.span!="across tiers", ]
 			}
 		}
 	}
@@ -239,7 +233,7 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 		mySearchResults <- rbind(mySearchResults.byTime, mySearchResults.byTier)
 		
 		#delete double hits
-		compare <- mySearchResults[, c("transcriptName", "dataID", "hit.pos.content")]
+		compare <- mySearchResults[, c("annotationID", "hit.pos.content")]
 		
 		doubles <- duplicated(compare)
 		mySearchResults <- mySearchResults[!doubles,]
@@ -250,158 +244,32 @@ search_transcript_fulltext<- function(t, s, showProgress=TRUE) {
 	
 	#=== filter by time
 	#--- time section
-	if (length(s@startSec)!=0) {
-		if (!is.na(s@startSec)) {
-			mySearchResults<- mySearchResults[(mySearchResults$endSec>=s@startSec), ]
+	if (length(s@filter.section.startsec)!=0) {
+		if (!is.na(s@filter.section.startsec)) {
+			mySearchResults <- mySearchResults[(mySearchResults$endSec>=s@filter.section.startsec), ]
 		}
 	}
-	if (length(s@endSec)!=0) {
-		if (!is.na(s@endSec)) {
-			mySearchResults<- mySearchResults[(mySearchResults$startSec<s@endSec), ]
+	if (length(s@filter.section.endsec)!=0) {
+		if (!is.na(s@filter.section.endsec)) {
+			mySearchResults <- mySearchResults[(mySearchResults$startSec<s@filter.section.endsec), ]
 		}
 	}
 	
 	if(	is.null(mySearchResults)) {
-		myColNames<-c("dataID", "transcriptName","tierName", "startSec","endSec", "content", "content.norm", "char.orig.bytime.start", "char.orig.bytime.end", "char.norm.bytime.start", "char.norm.bytime.end", "char.orig.bytier.start", "char.orig.bytier.end", "char.norm.bytier.start", "char.norm.bytier.end", "hit", "hit.nr" ,"hit.length", "hit.pos.fulltext", "hit.pos.content", "searchMode", "hit.span")
+		myColNames <-c("annotationID", "tier.name", "startSec","endSec", "content", "content.norm", "char.orig.bytime.start", "char.orig.bytime.end", "char.norm.bytime.start", "char.norm.bytime.end", "char.orig.bytier.start", "char.orig.bytier.end", "char.norm.bytier.start", "char.norm.bytier.end", "hit", "hit.nr" ,"hit.length", "hit.pos.fulltext", "hit.pos.content", "search.mode", "hit.span")
 		mySearchResults <- data.frame(matrix(ncol = length(myColNames), nrow = 0))
 		colnames(mySearchResults) <- myColNames	
 	}
 	
+	#add column transcript name
+	if(!is.null(mySearchResults)){
+		if (nrow(mySearchResults)==0) {
+			mySearchResults <- cbind(transcript.name=character(0), mySearchResults)
+		} else {
+			mySearchResults <- cbind(transcript.name=rep(t@name, times=nrow(mySearchResults)), mySearchResults)
+		}
+	}
 	#=== return results
 	return(mySearchResults)
-}
-
-#' Search in original content of a single transcript
-#'
-#' @param t Transcript object; transcript to search in.
-#' @param s Search object.
-#' @param showProgress Logical; if \code{TRUE} progress bar will be shown.
-#' 
-#' @return Data.frame; data frame with search results.
-#' @export
-#' 
-#' @example inst/examples/search_transcript_content.R
-#' 
-search_transcript_content <- function(t, s, showProgress=TRUE) {
-	if (is.null(t)) 				{	stop("Transcript object is null.")		}
-	
-	#=== update progress
-	if (showProgress==TRUE) {	
-		if (exists("act.environment", mode="environment")) {
-			if(exists("pb", envir=act.environment)) {
-				act.environment$pb$tick()
-			}
-		}
-	}
-	
-	temp <- NULL
-	
-	#=== get matches
-	myData <-t@data
-	
-	#=== filter 
-	#---tiers
-	if(length(s@filter.tiers.exclude)==0) {s@filter.tiers.exclude<-""}
-	if(length(s@filter.tiers.include)==0) {s@filter.tiers.include<-""}
-		
-	include <- c(1:length(myData$content))
-	#if any filter is set
-	if (!s@filter.tiers.exclude=="" | !s@filter.tiers.include=="" ) 	{
-		#if include filter is set
-		if (s@filter.tiers.include!="") {
-			include <- grep(s@filter.tiers.include, myData$tierName, ignore.case =TRUE, perl = TRUE)
-		}
-		
-		#if exclude filter is set
-		if (!s@filter.tiers.exclude=="") {
-			exclude	<- grep(s@filter.tiers.exclude, myData$tierName, ignore.case =TRUE, perl = TRUE)
-			include <- setdiff(include, exclude)
-		}
-		myData <- myData[include,]
-	}
-	
-	#--- time section
-	if (length(s@startSec)!=0) {
-		if (!is.na(s@startSec)) {
-			myData<- myData[(myData$endSec>=s@startSec), ]
-		}
-	}
-	if (length(s@endSec)!=0) {
-		if (!is.na(s@endSec)) {
-			myData<- myData[(myData$startSec<s@endSec), ]
-		}
-	}
-	
-	if (!is.null(myData)) {
-		if (s@searchNormalized==TRUE) {
-			if (is.na(myData$content.norm[1]))				{
-				matches.df    <- NULL
-			} else {
-				indices 	<- stringr::str_detect(myData$content.norm, s@pattern)
-				if (!any(indices)) {
-					matches.df    <- NULL
-				} else {
-					hits.pos			<- stringr::str_locate_all(myData$content.norm[indices], s@pattern)
-					hits.count 			<- stringr::str_count(myData$content.norm[indices], s@pattern)
-					hits.match			<- stringr::str_extract_all(myData$content.norm[indices], s@pattern)
-					dataID 				<- myData$dataID[indices]
-					matches.df 			<- cbind(dataID=dataID[1], hits.pos[[1]], hit.nr=1, hit=hits.match[[1]])
-					if (length(hits.pos)>1) {
-						for(j in 2:length(hits.pos)) {
-							matches.df <- rbind(matches.df, cbind(dataID=dataID[j], hits.pos[[j]], hit.nr=j, hit=hits.match[[j]]))
-						}
-					}
-					colnames(matches.df)[2] <-"hit.pos.content"
-				}
-			}
-		} else {
-			if (is.na(myData$content[1]))				{
-				matches.df    <- NULL
-			} else {
-				indices 	<- stringr::str_detect(myData$content, s@pattern)
-				if (!any(indices)) {
-					matches.df    <- NULL
-				} else {
-					hits.pos   			<- stringr::str_locate_all(myData$content[indices], s@pattern)
-					hits.count 			<- stringr::str_count(myData$content[indices], s@pattern)
-					hits.match			<- stringr::str_extract_all(myData$content[indices], s@pattern)
-					dataID 				<- myData$dataID[indices]
-					matches.df 			<- cbind(dataID=dataID[1], hits.pos[[1]], hit.nr=1, hit=hits.match[[1]])
-					if (length(hits.pos)>1) {
-						for(j in 2:length(hits.pos)) {
-							matches.df <- rbind(matches.df, cbind(dataID=dataID[j], hits.pos[[j]], hit.nr=j, hit=hits.match[[j]]))
-						}
-					}
-					colnames(matches.df)[2] <-"hit.pos.content"
-				}
-			}
-		}
-		
-		if (!is.null(matches.df)) {
-			if (nrow(matches.df)>0)	{
-				#turn matrix into data frame
-				sResults <- as.data.frame(matches.df)
-				
-				#add column with length of hit
-				sResults <- cbind(sResults, hit.length=as.numeric(stringr::str_length(sResults$hit)))
-				
-				#add columns: hit.pos.fulltext, searchMode, hit.span
-				sResults <- cbind(sResults, hit.pos.fulltext=as.numeric(NA), searchMode=as.character("byTier"), hit.span=as.character("within interval"))
-				
-				#turn factors into vectors
-				sResults$dataID    		   	<-  as.numeric(sResults$dataID) # as.numeric(levels(sResults$dataID))[sResults$dataID]
-				sResults$hit       		   	<-   as.character(sResults$hit) #as.character(levels(sResults$hit))[sResults$hit]
-				sResults$hit.pos.content	<-   as.numeric(sResults$hit.pos.content) #as.numeric(levels(sResults$hit.pos.content))[sResults$hit.pos.content]
-				sResults$end				<-   as.numeric(sResults$end) #as.numeric(levels(sResults$hit.pos.content))[sResults$hit.pos.content]
-				sResults$hit.nr				<-   as.numeric(sResults$hit.nr) #as.numeric(levels(sResults$hit.pos.content))[sResults$hit.pos.content]
-				sResults$hit.length			<-   as.numeric(sResults$hit.length) #as.numeric(levels(sResults$hit.pos.content))[sResults$hit.pos.content]
-				sResults$hit.pos.fulltext	<-   as.numeric(sResults$hit.pos.fulltext) #as.numeric(levels(sResults$hit.pos.content))[sResults$hit.pos.content]
-				
-				#merge results and data by column 
-				temp         <- merge(x=myData, y=sResults , by.x = "dataID", by.y ="dataID", all.y = TRUE)
-			}
-		}
-	}
-	return(temp)
 }
 

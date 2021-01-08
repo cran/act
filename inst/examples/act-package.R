@@ -1,6 +1,6 @@
 library(act)
 
-#========== Example data 
+# ========== Example data 
 # The act package comes with some example data. 
 # The data is stored at the following location:
 path <- system.file("extdata", "examplecorpus", package="act")
@@ -31,7 +31,7 @@ download.file(sourceurl, temp)
 unzip(zipfile=temp, exdir=path)
 }
 
-#========== Create a corpus object and load data
+# ========== Create a corpus object and load data
 # Now that we have the example data accessible, we can create a corpus object.
 # The corpus object is a structured collection of all the information that you can 
 # work with using act.
@@ -40,7 +40,7 @@ unzip(zipfile=temp, exdir=path)
 
 # --- Locate folder with annotation files
 # When creating a corpus object you will need to specify where your annotation 
-# files ('Praat' '*.TextGrids') are located.
+# files ('Praat' '.TextGrids' or 'ELAN' .eaf) are located.
 # We will use the example data, that we have just located in 'path'.
 path
 
@@ -52,9 +52,9 @@ path
 # --- Create corpus object and load annotation files
 # The following command will create a corpus object, with the name 'examplecorpus'.
 examplecorpus <- act::corpus_new(
-	corpusname = "examplecorpus",
-	folders_annotationfiles = path,
-	folders_mediafiles = path
+	pathsAnnotationFiles = path,
+	pathsMediaFiles = path,
+	name = "examplecorpus"
 )
 
 # The act package assumes, that annotation files and media files have the same base  
@@ -66,21 +66,22 @@ examplecorpus <- act::corpus_new(
 # The following command will give you a summary of the data contained in your corpus object.
 examplecorpus
 # More detailed information about the transcripts in your corpus object is available by 
-# calling the function corpus_overview()
-corpus_overview(examplecorpus)
+# calling the function act::info()
+act::info(examplecorpus)
 # If you are working in R studio, a nice way of inspecting this information is the following:
 \dontrun{
-	View(corpus_overview(examplecorpus))
+	View(act::info(examplecorpus)$transcripts)
+	View(act::info(examplecorpus)$tiers)
 }
 
-#========== all data
+# ========== all data
 # You can also get all data that is in the loaded annotation files in a data frame:
-alldata <- act::corpus_alldata(examplecorpus)
+all_annotations <- act::annotations_all(examplecorpus)
 \dontrun{
-	View(alldata)
+	View(all_annotations)
 }
 
-#========== Search
+# ========== Search
 # Let's do some searches in the data.
 # Search for the 1. Person Singular Pronoun in Spanish 'yo' in the examplecorpus
 mysearch <- act::search_new(x=examplecorpus, 
@@ -99,7 +100,7 @@ mysearch
 # Let's compare the two modes.
 mysearch.norm  <- act::search_new(examplecorpus, pattern="yo", searchNormalized=TRUE)
 mysearch.org   <- act::search_new(examplecorpus, pattern="yo", searchNormalized=FALSE)
-#There is a difference in the number of results.
+# There is a difference in the number of results.
 mysearch.norm@results.nr
 mysearch.org@results.nr
 

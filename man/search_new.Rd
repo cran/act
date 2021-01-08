@@ -7,51 +7,63 @@
 search_new(
   x,
   pattern,
-  searchMode = "fulltext",
+  searchMode = c("content", "fulltext", "fulltext.byTime", "fulltext.byTier"),
   searchNormalized = TRUE,
-  filterTranscriptsInclude = NA,
-  filterTranscriptsExclude = NA,
-  filterTiersInclude = NA,
-  filterTiersExclude = NA,
-  startSec = NA,
-  endSec = NA,
-  makeConcordance = TRUE,
-  prefix = "result",
-  runSearch = TRUE,
-  showProgress = TRUE,
-  updateX = TRUE
+  name = "mysearch",
+  resultidprefix = "result",
+  filterTranscriptNames = NULL,
+  filterTranscriptInclude = NULL,
+  filterTranscriptExclude = NULL,
+  filterTierNames = NULL,
+  filterTierInclude = NULL,
+  filterTierExclude = NULL,
+  filterSectionStartsec = NULL,
+  filterSectionEndsec = NULL,
+  concordanceMake = TRUE,
+  concordanceWidth = NULL,
+  cutSpanBeforesec = 0,
+  cutSpanAftersec = 0,
+  runSearch = TRUE
 )
 }
 \arguments{
-\item{x}{Corpus object.}
+\item{x}{Corpus object; basis in which will be searched.}
 
 \item{pattern}{Character string; search pattern as regular expression.}
 
-\item{searchMode}{Character string; takes the following values: content, fulltext (=default, includes both fulltext modes ), fulltext.byTime, fulltext.byTier.}
+\item{searchMode}{Character string; takes the following values: \code{content}, \code{fulltext} (=default, includes both full text modes), \code{fulltext.byTime}, \code{fulltext.byTier}.}
 
 \item{searchNormalized}{Logical; if \code{TRUE} function will search in the normalized content, if \code{FALSE} function will search in the original content.}
 
-\item{filterTranscriptsInclude}{Character string; as regular expression, limit search to certain transcripts matching the expression.}
+\item{name}{Character string; name of the search. Will be used, for example, as name of the sub folder when creating media cuts.}
 
-\item{filterTranscriptsExclude}{Character string; as regular expression, exclude certain transcripts matching the expression.}
+\item{resultidprefix}{Character string; prefix for the name of the consecutively numbered search results.}
 
-\item{filterTiersInclude}{Character string; as regular expression, limit search to certain tiers matching the expression.}
+\item{filterTranscriptNames}{Vector of character strings; names of transcripts to be included.}
 
-\item{filterTiersExclude}{Character string; as regular expression, exclude certain tiers matching the expression.}
+\item{filterTranscriptInclude}{Character string; as regular expression, limit search to certain transcripts matching the expression.}
 
-\item{startSec}{Double; start time of region for search.}
+\item{filterTranscriptExclude}{Character string; as regular expression, exclude certain transcripts matching the expression.}
 
-\item{endSec}{Double; end time of region for search.}
+\item{filterTierNames}{Vector of character strings; names of tiers to be included.}
 
-\item{makeConcordance}{Logical; if \code{TRUE} concordance will be added to search results.}
+\item{filterTierInclude}{Character string; as regular expression, limit search to certain tiers matching the expression.}
 
-\item{prefix}{Character string; prefix for the name of the consecutively numbered search results.}
+\item{filterTierExclude}{Character string; as regular expression, exclude certain tiers matching the expression.}
+
+\item{filterSectionStartsec}{Double; start time of region for search.}
+
+\item{filterSectionEndsec}{Double; end time of region for search.}
+
+\item{concordanceMake}{Logical; if \code{TRUE} concordance will be added to search results.}
+
+\item{concordanceWidth}{Integer; number of characters  to the left and right of the search hit in the concordance , the default is \code{120}.}
+
+\item{cutSpanBeforesec}{Double; Start the media and transcript cut some seconds before the hit to include some context, the default is \code{0}.}
+
+\item{cutSpanAftersec}{Double; End the media and transcript cut some seconds before the hit to include some context, the default is \code{0}.}
 
 \item{runSearch}{Logical; if \code{TRUE} search will be run in corpus object, if \code{FALSE} only the search object will be created.}
-
-\item{showProgress}{Logical; if \code{TRUE} progress bar will be shown.}
-
-\item{updateX}{Logical; If \code{TRUE} the original corpus object passed as x to the function will also be updated! If you do not want this, set to \code{FALSE}.}
 }
 \value{
 Search object.
@@ -89,4 +101,7 @@ mysearch <- act::search_new(examplecorpus, pattern=myRegEx, searchMode="fulltext
 mysearch
 mysearch@results$hit
 
+}
+\seealso{
+\link{search_run}, \link{search_meta}, \link{search_sub}
 }

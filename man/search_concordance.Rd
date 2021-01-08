@@ -4,27 +4,17 @@
 \alias{search_concordance}
 \title{Make concordance for search results}
 \usage{
-search_concordance(
-  x,
-  s,
-  baseForConcordance = "fulltext",
-  searchNormalized = TRUE,
-  showProgress = FALSE
-)
+search_concordance(x, s, searchNormalized = TRUE)
 }
 \arguments{
 \item{x}{Corpus object.}
 
 \item{s}{Search object.}
 
-\item{baseForConcordance}{Character string; takes the following values: content, fulltext (= default)}
-
 \item{searchNormalized}{Logical; if \code{TRUE} function will search in the normalized content, if \code{FALSE} function will search in the original content.}
-
-\item{showProgress}{Logical; if \code{TRUE} progress bar will be shown.}
 }
 \value{
-Data.frame; data frame with search results and concordance added.
+Search object.
 }
 \description{
 Make concordance for search results
@@ -36,16 +26,14 @@ library(act)
 # Search without creating the concordance immediately.
 # This is for example useful if you are working with a large corpus, since
 # making the concordance may take a while.
-mysearch <- act::search_new(examplecorpus, pattern="yo", makeConcordance=FALSE)
+mysearch <- act::search_new(examplecorpus, pattern="yo", concordanceMake=FALSE)
+mysearch@results[1,]
+
 
 # The results do not contain the concordance, it is only 15 columns
 ncol(mysearch@results)
 
 # Make the concordance
-conc <- act::search_concordance(x=examplecorpus, s=mysearch)
-colnames(conc)
-
-# You can now add the concordance to your search results data frame:
-mysearch@results <- cbind(mysearch@results, conc)
-ncol(mysearch@results)
+mysearch.new <- act::search_concordance(x=examplecorpus, s=mysearch)
+ncol(mysearch.new@results)
 }

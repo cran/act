@@ -16,7 +16,7 @@ search_results_export(
 \arguments{
 \item{s}{Search object. Search object containing the results you wish to export.}
 
-\item{path}{Character string; path where file will be saved. Please add the suffix '*.csv' or '*.xlsx' to the filename.}
+\item{path}{Character string; path where file will be saved. Please add the suffix '.csv' or '.xlsx' to the file name.}
 
 \item{sheetNameXLSX}{Character string, set the name of the excel sheet.}
 
