@@ -1,6 +1,7 @@
 #' Export a transcript object to a print transcript
 #' 
 #' If you want to modify the layout of the print transcripts, create a new layout object with \code{mylayout <- methods::new("layout")}, modify the settings and pass it as argument \code{l}.
+#' In the layout object you may also set additional filters to include/exclude tiers matching regular expressions.
 #'
 #' @param t Transcript object.
 #' @param l Layout object.
@@ -11,7 +12,6 @@
 #' @param header_heading Character string; text that will be used as heading.
 #' @param header_firstinfo Character string; text that will used as first information in the header.
 #' @param insert_arrow_annotationID Integer; ID of the annotation in front of which the arrow will be placed.
-#' @param alignBrackets Logical; if \code{TRUE} the function will align [] brackets that signal overlapping speech (attention: experimental function; results may not satisfy)
 #'
 #' @return Character string; transcript as text.
 #' 
@@ -29,12 +29,10 @@ export_printtranscript <- function (t,
 									filterSectionEndsec = NULL,  
 									insert_arrow_annotationID = "", 
 									header_heading ="", 
-									header_firstinfo = "" , 
-									alignBrackets=FALSE) {
+									header_firstinfo = "") {
 	#=== settings
 	if (missing(t)) 	{stop("Transcript object in parameter 't' is missing.") 	} else { if (class(t)[[1]]!="transcript") 	{stop("Parameter 't' needs to be a transcript object.") 	} }
-
-		if (is.null(l)) 	{
+	if (is.null(l)) 	{
 		l <- methods::new("layout")
 	}	
 	#--- check if output folder exists
@@ -65,10 +63,31 @@ export_printtranscript <- function (t,
 	options(act.transcript.spacesbefore= max(0, l@spacesbefore))
 	
 	#===================================== get data
-	#--- filter
+	#--- get the tier names
+	if (is.null(filterTierNames)) {
+		filterTierNames<-t@tiers$name
+	}
+	#filter the filterTierNames by regular expressions
+	if (!is.null(l@filter.tier.include.regex)) {
+		if (length(l@filter.tier.include.regex)>0) {
+			if (l@filter.tier.include.regex!="") {
+				filterTierNames <- grep(pattern=l@filter.tier.include.regex, filterTierNames, value=TRUE)
+			}
+		}
+	}
+	if (!is.null(l@filter.tier.exclude.regex)) {
+		if (length(l@filter.tier.exclude.regex)>0) {
+			if (l@filter.tier.exclude.regex!="") {
+				filterTierNames <- filterTierNames[-grep(pattern=l@filter.tier.exclude.regex, filterTierNames)]
+			}
+		}
+	}
+
+	#--- filter 
 	t <- act::transcripts_filter_single(t, filterTierNames=filterTierNames, filterSectionStartsec = filterSectionStartsec, filterSectionEndsec = filterSectionEndsec)
+	#--- cure
 	t <- act::transcripts_cure_single(t, annotationsWithReversedTimes=TRUE, overlappingAnnotations=TRUE, annotationsWithTimesBelowZero=FALSE, missingTiers=FALSE, showWarning=TRUE)
-	
+
 	#--- get annotations from transcript
 	myAnnotations <- t@annotations
 

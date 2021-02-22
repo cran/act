@@ -3,9 +3,9 @@
 #' The function remote controls 'Quicktime' by using an Apple Script. 
 #' It opens a search result in 'Quicktime' and plays it.
 #' 
-#' You need to be on a Mac to use this function.
+#' Note: You need to be on a Mac to use this function.
 #' 
-#' #' \emph{Span} \cr
+#' \emph{Span} \cr
 #' If you want to extend the cut before or after each search result, you can modify \code{@cuts.span.beforesec} and \code{@cuts.span.aftersec} in your search object.
 #' 
 #' @param x Corpus object.

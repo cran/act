@@ -35,7 +35,8 @@ helper_tiers_sort_table <- function (tierTable,
 		newRow[1,]<-NA
 	} else {
 		newRow <- .emptyTiers
-		newRow <- rbind(newRow, list(name=as.character("NA"), type=as.character("NA"), position=as.integer(NA)))
+		#newRow <- rbind(newRow, list(name=as.character("NA"), type=as.character("NA"), position=as.integer(NA)))
+		newRow <- rbind(newRow, list(name=NA, type=NA, position=NA))
 	}
 	
 	#check each pattern in the sort vector
@@ -91,17 +92,15 @@ helper_tiers_sort_table <- function (tierTable,
 		}
 	}
 	
-	#--- reorder and set new positions
+	#--- reorder and set new positions, set row names
 	if (nrow(newTable)>0) {
 		newTable <-newTable[order(newTable$counter),]
 		newTable$position <-seq(1,nrow(newTable))
+		rownames(newTable) <- newTable$name
 	}
 	
 	#--- remove column "counter"
 	newTable <-newTable[ ,!colnames(newTable)=="counter"]
-	
-	#--- set row names
-	rownames(newTable) <- newTable$name
-	
+
 	return(newTable)
 }

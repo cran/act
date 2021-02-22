@@ -1,9 +1,9 @@
-#' Open all search result in 'Quicktime' and play them
+#' Open all search results in 'Quicktime' and play them
 #' 
 #' The function remote controls 'Quicktime' by using an Apple Script. 
 #' It opens consecutively all search results in 'Quicktime' and plays them.
 #' 
-#' You need to be on a Mac to use this function.
+#' Note: You need to be on a Mac to use this function.
 #'
 #' @param x Corpus object.
 #' @param s Search object.

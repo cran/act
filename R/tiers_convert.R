@@ -10,12 +10,12 @@
 #' @param x Corpus object.
 #' @param intervalToPoint Logical; if \code{TRUE} interval tiers will be converted to point/text tiers.
 #' @param pointToInterval Logical; if \code{TRUE} point/text tiers will be converted to interval tiers.
-#' @param filterTranscriptNames Vector of character strings; names of the transcripts to be included. 
 #' @param filterTierNames Vector of character strings; names of the tiers to be included. 
+#' @param filterTranscriptNames Vector of character strings; names of the transcripts to be checked. If left open, all transcripts will be checked 
 #'
 #' @return Corpus object.
 #' 
-#' @seealso \link{tiers_rename}, \link{tiers_sort}
+#' @seealso \link{tiers_add}, \link{tiers_delete}, \link{tiers_rename}, \link{tiers_sort}, \link{helper_tiers_new_table}, \link{helper_tiers_sort_table}
 #' 
 #' @export
 #'
@@ -23,8 +23,9 @@
 tiers_convert <- function(x, 
 						  intervalToPoint=FALSE, 
 						  pointToInterval=FALSE, 
-						  filterTranscriptNames=NULL, 
-						  filterTierNames=NULL) {
+						  filterTierNames=NULL,
+						  filterTranscriptNames=NULL
+						  ) {
 	
 	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
 	
