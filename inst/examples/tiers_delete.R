@@ -9,7 +9,7 @@ all.tiers["B", "tiers.count"]
 
 # delete tiers
 tierNames <- c("A", "B")
-x<-examplecorpus
+x<- examplecorpus
 x <- act::tiers_delete(examplecorpus, tierNames=tierNames)
 x@history[length(x@history)]
 

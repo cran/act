@@ -57,9 +57,9 @@ transcripts_cure_single <- function (t,
 				if (length(ids)>1) {
 					for (i in 1:(length(ids)-1)) {
 						if 	(t@annotations$endSec[ids[i]]>t@annotations$startSec[ids[i]+1]) {
-							#t@annotations$endSec[ids[i]<-t@annotations$startSec[ids[i]+1]
-							print(tier)
-							print(i)
+							#t@annotations$endSec[ids[i]<- t@annotations$startSec[ids[i]+1]
+							#print(tier)
+							#print(i)
 							overlappingAnnotations.corrected.count <- overlappingAnnotations.corrected.count +1
 						}
 					}

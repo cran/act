@@ -14,7 +14,7 @@
 #'
 #' @example inst/examples/search_playresults_inquicktime.R
 #' 
-search_playresults_inquicktime <-function(x, 
+search_playresults_inquicktime <- function(x, 
 										  s, 
 										  bringQuicktimeToFront=FALSE) {
 	

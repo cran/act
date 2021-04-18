@@ -54,15 +54,15 @@ tiers_add <- function( x,
 	if (is.null(filterTranscriptNames)) {	filterTranscriptNames <- names(x@transcripts)	}
 	
 	#---correct values
-	tierName<-tierName[1]
-	tierType<-tierType[1]
+	tierName<- tierName[1]
+	tierType<- tierType[1]
 	if(!is.null(absolutePosition)) {
-		absolutePosition<-as.integer(absolutePosition)
-		if (absolutePosition<1) {absolutePosition<-1}
+		absolutePosition<- as.integer(absolutePosition)
+		if (absolutePosition<1) {absolutePosition<- 1}
 	}
 	if(!is.null(destinationTier)) {
-		destinationTier<-as.character(destinationTier)
-		relativePositionToDestinationTier<-as.integer(relativePositionToDestinationTier)
+		destinationTier<- as.character(destinationTier)
+		relativePositionToDestinationTier<- as.integer(relativePositionToDestinationTier)
 	}
 	
 	#=== counters
@@ -71,7 +71,7 @@ tiers_add <- function( x,
 	alreadyExistsInTranscripts <- c()
 	
 	#=== run through the transcripts
-	i<-filterTranscriptNames[1]
+	i<- filterTranscriptNames[1]
 	for (i in filterTranscriptNames) {
 		#print(i)
 		#---get the tier table
@@ -81,7 +81,7 @@ tiers_add <- function( x,
 		} 
 		if (nrow(newTable)>0) {
 			newRow <- newTable[1,]
-			newRow[1,]<-NA
+			newRow[1,]<- NA
 		} else {
 			newRow <- .emptyTiers
 			#newRow <- rbind(newRow, list(name=as.character("NA"), type=as.character("NA"), position=as.integer(NA)))
@@ -102,27 +102,27 @@ tiers_add <- function( x,
 			#--- set name and type of new row
 			newRow$name <- tierName
 			newRow$type <- tierType
-			rownames(newRow) <-tierName
+			rownames(newRow) <- tierName
 			
 			#--- set position
 			addThisTier <- FALSE
 			#- insert at the very end
 			if (is.null(absolutePosition) & is.null(destinationTier)) {
 				newRow$position<- max(newTable$position)+1
-				addThisTier <-TRUE
+				addThisTier <- TRUE
 			}
 			
 			#- insert in absolute position
 			if(!is.null(absolutePosition)) {
 				#get all tiers that are in this position or later
-				ids<-which(newTable$position>=absolutePosition)
+				ids<- which(newTable$position>=absolutePosition)
 				#increase their position
 				newTable$position[ids] <- newTable$position[ids] +1 
 				
 				#set  position of new row
 				newRow$position <- absolutePosition
 				
-				addThisTier <-TRUE
+				addThisTier <- TRUE
 			}
 			
 			#- insert after a certain tier
@@ -140,7 +140,7 @@ tiers_add <- function( x,
 						#if existing destination tier is not necessary
 						#insert tier in the end
 						newRow$position<- max(newTable$position)+1
-						addThisTier <-TRUE
+						addThisTier <- TRUE
 					}
 					
 				} else {
@@ -155,11 +155,11 @@ tiers_add <- function( x,
 					
 					#calculate new positions of existing tiers
 					# get all tiers that are in this position or later
-					ids<-which(newTable$position>=pos.new)
+					ids<- which(newTable$position>=pos.new)
 					# increase their position
 					newTable$position[ids] <- newTable$position[ids] +1 
 					
-					addThisTier <-TRUE
+					addThisTier <- TRUE
 				}
 			}
 			
@@ -201,7 +201,7 @@ tiers_add <- function( x,
 	if(!skipIfTierAlreadyExists) {
 		if (length(alreadyExistsInTranscripts)>0) {
 			message <- sprintf("The tier '%s' already exists in the following transcripts: ",tierName)
-			m       <-stringr::str_c("    ", alreadyExistsInTranscripts, collapse="\n")
+			m       <- stringr::str_c("    ", alreadyExistsInTranscripts, collapse="\n")
 			message <- stringr::str_c(message,"\n", m, collapse="\n")
 			stop(message)
 		}

@@ -34,7 +34,7 @@ search_cuts_srt <- function(x,
 	
 	
 	#--- check if output folder is given
-	destination_folder <-NULL
+	destination_folder <- NULL
 	if (!is.null(outputFolder)) {
 		destination_folder <- normalizePath(outputFolder)
 		if (destination_folder!="") {
@@ -65,7 +65,7 @@ search_cuts_srt <- function(x,
 	
 	if (nrow(s@results)) {
 		
-		i <-1
+		i <- 1
 		for (i in 1:nrow(s@results)) 	{
 			#update progress bar
 			helper_progress_tick()
@@ -127,7 +127,7 @@ search_cuts_srt <- function(x,
 					colnames(s@results)[ncol(s@results)] <- s@cuts.column.srt
 				}
 				#insert srt into search results
-				output <-stringr::str_flatten(srt, collapse="\n")
+				output <- stringr::str_flatten(srt, collapse="\n")
 				s@results[i, s@cuts.column.srt] <- output
 				
 			}
@@ -139,17 +139,17 @@ search_cuts_srt <- function(x,
 			
 			#--- save modified results
 			# R
-			filename <-paste("searchResults_", s@name, ".RData", sep="")
+			filename <- paste("searchResults_", s@name, ".RData", sep="")
 			path_R 	    <-	file.path(destination_folder, filename)
 			save(s, file = path_R)
 			
 			# CSV
-			filename <-paste("searchResults_", s@name, ".csv", sep="")
+			filename <- paste("searchResults_", s@name, ".csv", sep="")
 			path_CSV 		<- file.path(destination_folder, filename)
 			act::search_results_export(s, path_CSV, saveAsCSV = TRUE)
 			
 			# XLSX
-			filename <-paste("searchResults_", s@name, ".xlsx", sep="")
+			filename <- paste("searchResults_", s@name, ".xlsx", sep="")
 			path_XLSX  <- file.path(destination_folder, filename)
 			act::search_results_export(s, path_XLSX)
 		}

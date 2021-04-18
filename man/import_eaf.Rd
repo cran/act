@@ -45,10 +45,9 @@ path <- "PATH_TO_AN_EXISTING_EAF_ON_YOUR_COMPUTER"
 t <- act::import_eaf(filePath=path)
 t
 
-
 # Content of an .eaf file (already read by \code{readLines}), 
 # e.g. from an existing transcript object:
-mycontent <-examplecorpus@transcripts[['SYNC_rotar_y_flexionar']]@file.content
+mycontent <- examplecorpus@transcripts[['SYNC_rotar_y_flexionar']]@file.content
 t <- act::import_eaf(fileContent=mycontent, transcriptName="test")
 t
 

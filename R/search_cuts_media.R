@@ -72,16 +72,16 @@ search_cuts_media <- function(x,
 							  videoCodecCopy=FALSE, 
 							  audioCutsAsMP3=FALSE, 
 							  Panning) {
-	#x <-examplecorpus
-	#x <-corpus
+	#x <- examplecorpus
+	#x <- corpus
 	#s <- mysearch
 	#outputFolder <- 
-	#outputFolder <-NULL
+	#outputFolder <- NULL
 	#filterMediaInclude <- ""
-	#fastVideoPostioning <-TRUE
-	#videoCodecCopy <-FALSE
-	#audioCutsAsMP3 <-FALSE
-	#Panning <-NULL
+	#fastVideoPostioning <- TRUE
+	#videoCodecCopy <- FALSE
+	#audioCutsAsMP3 <- FALSE
+	#Panning <- NULL
 	
 	
 	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
@@ -95,7 +95,7 @@ search_cuts_media <- function(x,
 	if (exists("act.environment", mode="environment")) {
 		if(exists("pb", envir=act.environment)) {
 			act.environment$pb <- progress::progress_bar$new(
-				format = "  Creating transcripts  [:bar] :percent missing: :eta",
+				format = "  Creating cutlist  [:bar] :percent missing: :eta",
 				total = max(1,nrow(s@results)), 
 				clear = FALSE, 
 				show_after = 0,
@@ -107,17 +107,17 @@ search_cuts_media <- function(x,
 	if (missing(outputFolder)) {
 		output_folder_cutlist <- "."
 	} else {
-		output_folder_cutlist <-normalizePath(outputFolder)
+		output_folder_cutlist <- normalizePath(outputFolder)
 		if (file.exists(output_folder_cutlist)==FALSE) 	{
 			stop("Output folder does not exist.")
 		}		
 	}
 
 	#make total lists
-	cutlist_total_mac <-c()
-	cutlist_total_win <-c()
+	cutlist_total_mac <- c()
+	cutlist_total_win <- c()
 	
-	i <-1
+	i <- 1
 	#for each search result
 	for (i in 1:nrow(s@results)) 	{
 		#update progress
@@ -127,8 +127,8 @@ search_cuts_media <- function(x,
 			}
 		}
 		#reset individual lists
-		cutlist_win <-c()
-		cutlist_mac <-c()
+		cutlist_win <- c()
+		cutlist_mac <- c()
 
 		#=== get transcript
 		t <- NULL
@@ -155,7 +155,7 @@ search_cuts_media <- function(x,
 				}
 		
 				#for each media file
-				j <-1
+				j <- 1
 				for (j in 1:length(input_paths)) {
 					#====== file name of original
 					myMediaFileName <- stringr::str_to_lower(basename(tools::file_path_sans_ext(   input_paths[j])))
@@ -186,19 +186,20 @@ search_cuts_media <- function(x,
 	
 					#====== PANNED
 					#if  CreatePannedVersions in the arguments if the functions is not set
-					if (missing(Panning)) {
+					CreatePannedVersions <- 0
+					if (!missing(Panning)) {
+						CreatePannedVersions <- Panning
+					} else { 
 						#check if channels are set in the search results
 						if(options()$act.ffmpeg.exportchannels.fromColumnName %in% colnames(s@results)) {
 							#if it is set, take the value given there
 							CreatePannedVersions <- s@results[i, options()$act.ffmpeg.exportchannels.fromColumnName]
-						} else {
-							#do not create a panned version
-							CreatePannedVersions <- 0
+							if (is.na(CreatePannedVersions)) {
+								CreatePannedVersions <-0
+							}
 						}
-					} else {
-						CreatePannedVersions <- Panning
 					}
-
+					
 					if (CreatePannedVersions==0 ) {			#no panning
 					} else if (CreatePannedVersions==1 ) {	#only left
 					} else if (CreatePannedVersions==2 ) {	#only right
@@ -278,7 +279,7 @@ search_cuts_media <- function(x,
 					
 					#=== destination path
 					out_filepath <- rep("",3)
-					filename <-as.character(s@results[i, filename.fromColumnName])
+					filename <- as.character(s@results[i, filename.fromColumnName])
 					#replace everything that is not allowed in file names
 					filename <- stringr::str_replace_all(filename, '/', "_")
 					filename <- stringr::str_replace_all(filename, '\\\\', "_")
@@ -385,7 +386,7 @@ search_cuts_media <- function(x,
 	return(s)
 }
 
-makeBlock <- function(os, CreatePannedVersions, in_filepath, out_filename, cmd, titletext) {
+makeBlock <- function(os, CreatePannedVersionsBlock, in_filepath, out_filename, cmd, titletext) {
 	if (os=="win") {
 		block <- '
 IF EXIST "INFILEPATH" ( 
@@ -414,31 +415,31 @@ fi\n\n'
 	#2 ch2
 	#3 ch1 & 2
 	#4 all audio & ch1 & ch2
-	if (CreatePannedVersions==0) { 
+	if (CreatePannedVersionsBlock==0) { 
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd1", cmd[1])
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd2\n", "" )
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd3\n", "")
 	}
 	
-	if (CreatePannedVersions==1) { 
+	if (CreatePannedVersionsBlock==1) { 
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd1\n", "")
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd2", cmd[2])
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd3\n", "")
 	}
 	
-	if (CreatePannedVersions==2) { 
+	if (CreatePannedVersionsBlock==2) { 
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd1\n", "")
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd2\n", "")
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd3", cmd[3])
 	}
 	
-	if (CreatePannedVersions==3) { 
+	if (CreatePannedVersionsBlock==3) { 
 		block <- 	stringr::str_replace_all(block, " *FFMPEGcmd1\n", "")
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd2", cmd[2])
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd3", cmd[3])
 	}
 	
-	if (CreatePannedVersions==4) { 
+	if (CreatePannedVersionsBlock==4) { 
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd1", cmd[1])
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd2", cmd[2])
 		block <- 	stringr::str_replace_all(block, "FFMPEGcmd3", cmd[3])

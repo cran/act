@@ -40,7 +40,7 @@ search_openresult_inelan  <- function(x,
 	
 	
 	#--- check if ELAN exists
-	path.elan<-getOption("act.path.elan", default="")
+	path.elan<- getOption("act.path.elan", default="")
 	if(path.elan=="") {
 		stop("ELAN not found. Please set the path to the ELAN executable in the option 'act.path.elan' using options(act.path.elan='PATHTOYOURELANEXECUTABLE')")
 	}else {
@@ -80,13 +80,13 @@ search_openresult_inelan  <- function(x,
 	#--- create pfsx file
 	#check if pfsx file already exists - make a backup
 #	file.path.eaf<-'/Users/oliverehmer/Desktop/Quiz.eaf'
-#	pattern<-stringr::str_replace(basename(file.path.eaf), pattern='eaf',replacement="*pfsx$") 
+#	pattern<- stringr::str_replace(basename(file.path.eaf), pattern='eaf',replacement="*pfsx$") 
 #	filenames <- list.files(dirname(file.path.eaf), pattern=pattern)
 #	filenames <- tools::file_path_sans_ext(filenames)
 #	destination.name <- tools::file_path_sans_ext(basename(file.path.eaf))
 #   check if destinatino name already exists
 #	if(destination.name %in% filenames) {
-#		uniquename<-make.unique(filenames, destination.name)
+#		uniquename<- make.unique(filenames, destination.name)
 	#}
 		
 	pfsx<-	   '<?xml version="1.0" encoding="UTF-8"?>
@@ -105,7 +105,7 @@ search_openresult_inelan  <- function(x,
 				            <Long>%s</Long>
 				    </pref>
 				</preferences>'
-	startMiliSec <-round(s@results$startSec[resultNr]*1000, 0) 
+	startMiliSec <- round(s@results$startSec[resultNr]*1000, 0) 
 	endMiliSec <- round(s@results$endSec[resultNr]*1000, 0) 
 	pfsx.1 <- sprintf(pfsx, startMiliSec, endMiliSec, max(0, startMiliSec-1000),  startMiliSec)
 	#cat(pfsx.1)

@@ -65,7 +65,7 @@ export_printtranscript <- function (t,
 	#===================================== get data
 	#--- get the tier names
 	if (is.null(filterTierNames)) {
-		filterTierNames<-t@tiers$name
+		filterTierNames<- t@tiers$name
 	}
 	#filter the filterTierNames by regular expressions
 	if (!is.null(l@filter.tier.include.regex)) {
@@ -190,9 +190,9 @@ export_printtranscript <- function (t,
 			
 			#check if the first bracket is already aligned
 			if (myAnnotations$bracketsLeftAligned[i]) {
-				startWithBracketI <-2					
+				startWithBracketI <- 2					
 			} else { 
-				startWithBracketI <-1	
+				startWithBracketI <- 1	
 			}
 			
 			#check if text contains a bracket
@@ -436,7 +436,7 @@ export_printtranscript <- function (t,
 		}
 	} 
 	
-	output <-text_all
+	output <- text_all
 	
 	#=== header
 	if (l@header.insert==TRUE) {
@@ -473,12 +473,12 @@ export_printtranscript <- function (t,
 	
 	if (is.null(outputPath)) {
 	} else {
-		fileConn <-file(outputPath)
+		fileConn <- file(outputPath)
 		writeLines(output, fileConn)
 		close(fileConn)
 	}
 	
-	#	output <-stringr::str_flatten(output, collapse="\\n")
+	#	output <- stringr::str_flatten(output, collapse="\\n")
 	
 	return(output)
 }

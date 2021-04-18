@@ -22,8 +22,8 @@ search_cuts_printtranscript <- function(x,
 										s, 
 										l=NULL, 
 										outputFolder=NULL ) {
-	#x <-corpus
-	#s <-mysearch
+	#x <- corpus
+	#s <- mysearch
 	
 	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }
 	if (missing(s)) 	{stop("Search object in parameter 's' is missing.") 		} else { if (class(s)[[1]]!="search")		{stop("Parameter 's' needs to be a search object.") 	} }
@@ -34,7 +34,7 @@ search_cuts_printtranscript <- function(x,
 	}	
 	
 	#--- check if output folder is given
-	destination_folder <-NULL
+	destination_folder <- NULL
 	if (!is.null(outputFolder)) {
 		destination_folder <- normalizePath(outputFolder)
 		if (dir.exists(destination_folder)==FALSE) 	{
@@ -141,11 +141,11 @@ search_cuts_printtranscript <- function(x,
 					colnames(s@results)[ncol(s@results)] <- s@cuts.column.printtranscript
 				}
 				#insert transcript into search results
-				output <-stringr::str_flatten(printtrans, collapse="\n")
+				output <- stringr::str_flatten(printtrans, collapse="\n")
 				s@results[i, s@cuts.column.printtranscript] <- output
 				
 				#cummulate transcripts
-				alltranscripts <-c(alltranscripts, printtrans, "","")
+				alltranscripts <- c(alltranscripts, printtrans, "","")
 				
 			}
 		} #next i
@@ -164,17 +164,17 @@ search_cuts_printtranscript <- function(x,
 			
 			#--- save modified results
 			# R
-			filename <-paste("searchResults_", s@name, ".RData", sep="")
+			filename <- paste("searchResults_", s@name, ".RData", sep="")
 			path_R 	    <-	file.path(destination_folder, filename)
 			save(s, file = path_R)
 			
 			# CSV
-			filename <-paste("searchResults_", s@name, ".csv", sep="")
+			filename <- paste("searchResults_", s@name, ".csv", sep="")
 			path_CSV 		<- file.path(destination_folder, filename)
 			act::search_results_export(s, path_CSV, saveAsCSV = TRUE)
 			
 			# XLSX
-			filename <-paste("searchResults_", s@name, ".xlsx", sep="")
+			filename <- paste("searchResults_", s@name, ".xlsx", sep="")
 			path_XLSX  <- file.path(destination_folder, filename)
 			act::search_results_export(s, path_XLSX)
 		}

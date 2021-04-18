@@ -32,7 +32,7 @@ search_openresult_inpraat  <- function(x,
 									   filterMediaFile=c('.*\\.(aiff|aif|wav)', '.*\\.mp3') ) {
 	
 	# result <- mysearch@results[1,]
-	# x <-examplecorpus
+	# x <- examplecorpus
 	# search_openresult_inpraat(x, searchresults[1,])
 	
 	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		} else { if (class(x)[[1]]!="corpus") 		{stop("Parameter 'x' needs to be a corpus object.") 	} }

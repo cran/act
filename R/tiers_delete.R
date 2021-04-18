@@ -39,11 +39,11 @@ tiers_delete <- function(x,
 	}
 	if (is.null(filterTranscriptNames)) {	filterTranscriptNames <- names(x@transcripts)	}
 	
-	i<-filterTranscriptNames[2]
+	i<- filterTranscriptNames[2]
 	for (i in filterTranscriptNames) {
 
 		#check if transcript contains some of the tiers
-		tiers.ids<-which(x@transcripts[[i]]@tiers$name %in% tierNames)
+		tiers.ids<- which(x@transcripts[[i]]@tiers$name %in% tierNames)
 		if(length(tiers.ids>0)) {
 			#remember name of the transcripts
 			transcripts_modified_names <- c(transcripts_modified_names, i)
@@ -55,7 +55,7 @@ tiers_delete <- function(x,
 			x@transcripts[[i]]@tiers <- x@transcripts[[i]]@tiers[-tiers.ids, ]
 				
 			#delete annotations
-			annotations.ids<-which(x@transcripts[[i]]@annotations$tier.name %in% tierNames)
+			annotations.ids<- which(x@transcripts[[i]]@annotations$tier.name %in% tierNames)
 			x@transcripts[[i]]@annotations <- x@transcripts[[i]]@annotations[-annotations.ids, ]
 			annotations_deleted_count <- length(annotations.ids)
 			annotations_deleted_count_all <- annotations_deleted_count_all + annotations_deleted_count
