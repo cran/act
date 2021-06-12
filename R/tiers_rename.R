@@ -2,7 +2,7 @@
 #' 
 #' Renames all tiers in all transcript objects of a corpus.
 #' If only certain transcripts should be affected set the parameter \code{filterTranscriptNames}. 
-#' In case that you want to select transcripts by using regular expressions use the function \code{act::search_meta} first.
+#' In case that you want to select transcripts by using regular expressions use the function \code{act::search_makefilter} first.
 #' 
 #' The tiers will only be renamed if the resulting names preserve the uniqueness of the tier names.
 #' Results  will be reported in \code{@history} of the transcript objects.
@@ -36,6 +36,10 @@ tiers_rename <- function(x,
 	tiers_renamed_nr <- 0
 	tiers_problematic_nr <- 0
 	
+	#x<-corpus2
+	#searchPattern<-"TEST"
+	#searchReplacement<-"XXX"
+	#filterTranscriptNames<-NULL
 	
 	#=== get the transcript names
 	#if none are given, take all names
@@ -47,7 +51,7 @@ tiers_rename <- function(x,
 		if (filterTranscriptNames[1]=="") { filterTranscriptNames <- NULL }
 	}
 	if (is.null(filterTranscriptNames)) {	filterTranscriptNames <- names(x@transcripts)	}
-	
+	#i<-1
 	for (i in filterTranscriptNames) {
 		#reset transcript log
 		x@transcripts[[i]]@modification.systime <- character()
@@ -93,7 +97,7 @@ tiers_rename <- function(x,
 				transcripts_problematic_ids <- c(transcripts_problematic_ids, i)
 				
 			} else {
-				#all names only 1 occurrence
+				#all names only 1 occurrence (they are unique!)
 				x@transcripts[[i]]@modification.systime <- Sys.time()
 				x@transcripts[[i]]@history[[length(x@transcripts[[i]]@history)+1]] <-	list( 
 					modification         ="tiers_rename",
@@ -106,7 +110,6 @@ tiers_rename <- function(x,
 					tiers.after.names    =tiers_after$name
 				)
 				
-				
 				#counter for corpus object
 				tiers_renamed_nr <- tiers_renamed_nr + length(setdiff(tiers_after$name, tiers_before$name))
 				transcripts_modified_nr <- transcripts_modified_nr +1
@@ -114,8 +117,9 @@ tiers_rename <- function(x,
 				
 				#set new values in tiers list
 				x@transcripts[[i]]@tiers <- tiers_after
+				rownames(x@transcripts[[i]]@tiers) <- x@transcripts[[i]]@tiers$name
 				
-				#apply changes
+				#aset new names in annotations
 				x@transcripts[[i]]@annotations$tier.name <- stringr::str_replace_all(x@transcripts[[i]]@annotations$tier.name, searchPattern, searchReplacement)
 			}
 		}

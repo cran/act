@@ -155,7 +155,7 @@ export_exb <- function(t,
 
 	#--- files
 	if (createMediaLinks) {
-		files   <- sprintf(files, basename(t@media.path), sep='')
+		files   <- sprintf(files, basename(t@media.path))
 		files   <- paste(files, collapse='\n')
 		if (length(files)==0) {
 			files <- '<referenced-file url=""/>'
@@ -172,12 +172,12 @@ export_exb <- function(t,
 	#create list of speakers
 	numberofspeakers <- max(1, nrow(t@tiers))
 	speakernames <- paste("SPK", 1:numberofspeakers, sep="")
-	speaker   <- sprintf(speaker, speakernames, speakernames, sep='')
+	speaker   <- sprintf(speaker, speakernames,  speakernames)
 	speaker   <- paste(speaker, collapse='\n')
 	#cat(speaker)
 	
 	#--- speakertable
-	speakertable   <- sprintf(speakertable, speaker, sep='')
+	speakertable   <- sprintf(speakertable, speaker)
 	#cat(speakertable)
 
 	#--- head
@@ -192,8 +192,8 @@ export_exb <- function(t,
 		if (min (alltimes>0)) {
 			alltimes <- c(0,alltimes)
 		}
-		if (max (alltimes< t@length )) {
-			alltimes <- c(alltimes, t@length)
+		if (max (alltimes< t@length.sec )) {
+			alltimes <- c(alltimes, t@length.sec)
 		}
 		alltimes <- alltimes[order(alltimes)]
 		alltimes <- unique(alltimes)
@@ -210,7 +210,7 @@ export_exb <- function(t,
 		myColnames[myColnames=="ts"] <-"tsEnd" 
 		colnames(myAnnotations) <- myColnames
 		#generate timeline
-		tli   <- sprintf(tli, alltimes$ts, alltimes$value, sep='')
+		tli   <- sprintf(tli, alltimes$ts, alltimes$value)
     } else {
 		tli   <-         '<tli id="T0"/>\n<tli id="T1"/>'
     }
@@ -222,7 +222,7 @@ export_exb <- function(t,
 	
 	#iterate through all tiers
 	if (nrow(t@tiers)==0) {
-		tier <- '      <tier id="TIE0" speaker="SPK0" category="v" type="t" display-name="X [v]">\n</tier>'
+		tiers <- '      <tier id="TIE0" speaker="SPK0" category="v" type="t" display-name="X [v]">\n</tier>'
 	} else {
 		#sort annotations by tier names and start time
 		myAnnotations <- myAnnotations[order(ordered(myAnnotations$tier.name, levels = t@tiers$name), myAnnotations$startSec),]
@@ -233,16 +233,20 @@ export_exb <- function(t,
 		for (tierNr in 1:nrow(t@tiers)) 	{
 			speaker_name <- speakernames[tierNr]
 			
-			event_block <- sprintf(events, myAnnotations$tsStart[myAnnotations$tier.name==t@tiers$name[tierNr]], myAnnotations$tsEnd[myAnnotations$tier.name==t@tiers$name[tierNr]], myAnnotations$content[myAnnotations$tier.name==t@tiers$name[tierNr]], sep="\n")
+			event_block <- sprintf(events, myAnnotations$tsStart[myAnnotations$tier.name==t@tiers$name[tierNr]], 
+								   myAnnotations$tsEnd[myAnnotations$tier.name==t@tiers$name[tierNr]], 
+								   myAnnotations$content[myAnnotations$tier.name==t@tiers$name[tierNr]] 
+								   )
+			
 			event_block <- paste(event_block, collapse="\n")
 			#cat(event_block)
 			
-			tier_block[tierNr] <- sprintf(tier, t@tiers$name[tierNr], speaker_name, speaker_name, event_block, sep="\n")
+			tier_block[tierNr] <- sprintf(tier, t@tiers$name[tierNr], speaker_name, speaker_name, event_block)
 			tier_block[tierNr] <- paste(tier_block[tierNr], collapse="\n")
 			#cat(tier_block[[tierNr]])
 		}
+		tiers <- paste(unlist(tier_block), collapse="\n")
 	}
-	tiers <- paste(unlist(tier_block), collapse="\n")
 	basic_body <- sprintf(basic_body, timeline, tiers)
 	
 	#=== put everything together

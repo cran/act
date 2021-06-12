@@ -7,12 +7,14 @@
 search_cuts_media(
   x,
   s,
-  outputFolder,
+  cutSpanBeforesec = NULL,
+  cutSpanAftersec = NULL,
+  outputFolder = NULL,
   filterMediaInclude = "",
   fastVideoPostioning = TRUE,
   videoCodecCopy = FALSE,
   audioCutsAsMP3 = FALSE,
-  Panning
+  Panning = NULL
 )
 }
 \arguments{
@@ -20,11 +22,15 @@ search_cuts_media(
 
 \item{s}{Search object.}
 
+\item{cutSpanBeforesec}{Double; Start the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
+
+\item{cutSpanAftersec}{Double; End the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
+
 \item{outputFolder}{Character string; path to folder where files will be written.}
 
 \item{filterMediaInclude}{Character string; regular expression to match only some of the media files in \code{corpus@transcripts[[ ]]@media.path}.}
 
-\item{fastVideoPostioning}{Logical; If \code{TRUE} FFmpeg command using fast video positioning will be used \code{options()$act.ffmpeg.command.fastVideoPostioning}.}
+\item{fastVideoPostioning}{Logical; If \code{TRUE} the FFmpeg command will be using the parameter fast video positioning as specified in \code{options()$act.ffmpeg.command.fastVideoPostioning}.}
 
 \item{videoCodecCopy}{Logical; if \code{TRUE} FFMPEG will use the option \emph{codec copy} for videos.}
 
@@ -49,9 +55,6 @@ The cut lists will be stored in different ways:
 \item Individual cut lists for EACH search result will be stored in additional columns in the data frame \code{s@results}.
 The cut lists that can be executed in the Terminal (Apple) or the Command Line Interface (Windows).
 }
-
-\emph{Span} \cr
-If you want to extend the cut before or after each search result, you can modify \code{@cuts.span.beforesec} and \code{@cuts.span.aftersec} in your search object.
 
 \emph{Input media files}\cr
 The function will use all files in  \code{corpus@transcripts[[ ]]@media.path}.
@@ -117,19 +120,19 @@ library(act)
 	# Get entire cut list for Mac and display on screen, 
 	# so you can copy&paste this into the Terminal
 	mycutlist <- mysearch@cuts.cutlist.mac 
-	cat(stringr::str_c(mycutlist, sep="\n", collapse = "\n"))
+	cat(mycutlist)
 	# Cut list for first search result
 	mycutlist <- mysearch@results$cuts.cutlist.mac[[1]]
-	cat(stringr::str_c(mycutlist, sep="\n", collapse = "\n"))
+	cat(mycutlist)
 	
 	# Check results for Windows:
 	# Get entire cut list for Mac and display on screen, 
 	# so you can copy&paste this into the CLI
 	mycutlist <- mysearch@cuts.cutlist.win 
-	cat(stringr::str_c(mycutlist, sep="\n", collapse = "\n"))
+	cat(mycutlist)
 	# Cut list for first search result
 	mycutlist <- mysearch@results$cuts.cutlist.win[[1]]
-	cat(stringr::str_c(mycutlist, sep="\n", collapse = "\n"))
+	cat(mycutlist)
 	
 	# It is, however, more convenient to specify the argument 'outputFolder' in order to get
 	# the cut list as a (executable) file/batch list.

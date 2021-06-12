@@ -10,10 +10,7 @@
 #' * A cut list for for ALL search results will be stored in \code{s@cuts.cutlist.mac} to be used on MacOS and \code{s@cuts.cutlist.win} to be used on Windows.
 #' * Individual cut lists for EACH search result will be stored in additional columns in the data frame \code{s@results}.
 #' The cut lists that can be executed in the Terminal (Apple) or the Command Line Interface (Windows). 
-#' 
-#' \emph{Span} \cr
-#' If you want to extend the cut before or after each search result, you can modify \code{@cuts.span.beforesec} and \code{@cuts.span.aftersec} in your search object.
-#' 
+#'  
 #' \emph{Input media files}\cr
 #' The function will use all files in  \code{corpus@transcripts[[ ]]@media.path}.
 #' Therefore you will need to set the options \code{filterMediaInclude} filtering for which input media files you want to create the cuts.
@@ -52,9 +49,11 @@
 #' 
 #' @param x Corpus object; Please note: all media paths for a transcript need to be given as a list in the corpus object in \code{corpus@transcripts[[ ]]@media.path} . You can use the respective media functions. . 
 #' @param s Search object.
+#' @param cutSpanBeforesec Double; Start the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.
+#' @param cutSpanAftersec Double; End the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.
 #' @param outputFolder Character string; path to folder where files will be written.
 #' @param filterMediaInclude Character string; regular expression to match only some of the media files in \code{corpus@transcripts[[ ]]@media.path}.
-#' @param fastVideoPostioning Logical; If \code{TRUE} FFmpeg command using fast video positioning will be used \code{options()$act.ffmpeg.command.fastVideoPostioning}.
+#' @param fastVideoPostioning Logical; If \code{TRUE} the FFmpeg command will be using the parameter fast video positioning as specified in \code{options()$act.ffmpeg.command.fastVideoPostioning}.
 #' @param videoCodecCopy Logical; if \code{TRUE} FFMPEG will use the option *codec copy* for videos.
 #' @param audioCutsAsMP3 Logical; If \code{TRUE} audio cuts will be exported as '.mp3' files, using  \code{options()$act.ffmpeg.command.audioCutsAsMP3}.
 #' @param Panning Integer; 0=leave audio as is (ch1&ch2) , 1=only channel 1 (ch1), 2=only channel 2 (ch2), 3=both channels separated (ch1&ch2), 4=all three versions (ch1&ch2, ch1, ch2). This setting will override the option made in 'act.ffmpeg.exportchannels.fromColumnName' .
@@ -66,12 +65,14 @@
 #' 
 search_cuts_media <- function(x, 
 							  s, 
-							  outputFolder, 
+							  cutSpanBeforesec = NULL,
+							  cutSpanAftersec = NULL,
+							  outputFolder=NULL, 
 							  filterMediaInclude="", 
 							  fastVideoPostioning=TRUE, 
 							  videoCodecCopy=FALSE, 
 							  audioCutsAsMP3=FALSE, 
-							  Panning) {
+							  Panning=NULL) {
 	#x <- examplecorpus
 	#x <- corpus
 	#s <- mysearch
@@ -92,25 +93,19 @@ search_cuts_media <- function(x,
 	myWarnings <- c()
 
 	#set progress bar	
-	if (exists("act.environment", mode="environment")) {
-		if(exists("pb", envir=act.environment)) {
-			act.environment$pb <- progress::progress_bar$new(
-				format = "  Creating cutlist  [:bar] :percent missing: :eta",
-				total = max(1,nrow(s@results)), 
-				clear = FALSE, 
-				show_after = 0,
-				width= 60)
-		}
-	}
+	helper_progress_set("Creating cutlist", max(1,nrow(s@results)))
 	
 	#--- if cut list should be saved - check it  output folder exists
-	if (missing(outputFolder)) {
+	if (is.null(outputFolder)) {
 		output_folder_cutlist <- "."
 	} else {
 		output_folder_cutlist <- normalizePath(outputFolder)
-		if (file.exists(output_folder_cutlist)==FALSE) 	{
-			stop("Output folder does not exist.")
-		}		
+	}
+	if (!is.null(cutSpanBeforesec)) 	{
+		s@cuts.span.beforesec       <- as.double(cutSpanBeforesec)
+	}
+	if (!is.null(cutSpanAftersec)) {
+		s@cuts.span.aftersec        <- as.double(cutSpanAftersec)	
 	}
 
 	#make total lists
@@ -120,12 +115,9 @@ search_cuts_media <- function(x,
 	i <- 1
 	#for each search result
 	for (i in 1:nrow(s@results)) 	{
-		#update progress
-		if (exists("act.environment", mode="environment")) {
-			if(exists("pb", envir=act.environment)) {
-				act.environment$pb$tick()
-			}
-		}
+		#update progress bar
+		helper_progress_tick()
+		
 		#reset individual lists
 		cutlist_win <- c()
 		cutlist_mac <- c()
@@ -187,7 +179,7 @@ search_cuts_media <- function(x,
 					#====== PANNED
 					#if  CreatePannedVersions in the arguments if the functions is not set
 					CreatePannedVersions <- 0
-					if (!missing(Panning)) {
+					if (!is.null(Panning)) {
 						CreatePannedVersions <- Panning
 					} else { 
 						#check if channels are set in the search results
@@ -291,7 +283,7 @@ search_cuts_media <- function(x,
 					#====== Replacements in command
 					#--- times
 					startSec 	<- max(0, s@results$startSec[i] - s@cuts.span.beforesec)
-					endSec 		<- min(s@results$endSec[i] + s@cuts.span.aftersec, t@length)
+					endSec 		<- min(s@results$endSec[i] + s@cuts.span.aftersec, t@length.sec)
 					
 					#--- replace general place holders	
 					cmd <- 	stringr::str_replace_all(cmd, "INFILEPATH", 				input_paths[j])
@@ -348,7 +340,13 @@ search_cuts_media <- function(x,
 	} else {
 		#--- save cutlists
 		# if output folder is given
-		if (!missing(outputFolder)) {
+		if (!is.null(outputFolder)) {
+			#-- make the destination folder, if it does not exist
+			output_folder_cutlist.sub <- file.path(output_folder_cutlist, s@name)
+			if (dir.exists(output_folder_cutlist.sub)==FALSE) 	{
+				dir.create(output_folder_cutlist.sub, recursive=TRUE)
+			}
+			
 			#-- name
 			cutlistFileNameSansExt="FFMPEG_cutlist"
 			if (s@name!="") {
@@ -356,7 +354,7 @@ search_cuts_media <- function(x,
 			}
 			
 			#--- save cutlist_total_win as cmd
-			myFilepath 	<- file.path(output_folder_cutlist, paste(cutlistFileNameSansExt, "_win.cmd", sep=""))
+			myFilepath 	<- file.path(output_folder_cutlist.sub, paste(cutlistFileNameSansExt, "_win.cmd", sep=""))
 			fileConn 	<- file(myFilepath)
 			writeLines(cutlist_total_win, fileConn)
 			close(fileConn)
@@ -365,13 +363,16 @@ search_cuts_media <- function(x,
 			#add that it is an executable
 			cutlist_total_mac <- c("#!/bin/sh",cutlist_total_mac)
 			#save
-			myFilepath 	<- file.path(output_folder_cutlist, paste(cutlistFileNameSansExt, "_mac", sep=""))
+			myFilepath 	<- file.path(output_folder_cutlist.sub, paste(cutlistFileNameSansExt, "_mac", sep=""))
 			fileConn 	<- file(myFilepath)
 			writeLines(cutlist_total_mac, fileConn)
 			close(fileConn)
-			#only do this on a mac or a linux machine
-			if (Sys.info()["sysname"]=="Darwin") {
-				system(paste("chmod 755 ", myFilepath, sep=""))
+			
+			#make executable on a mac or a linux machine
+			if (file.exists(myFilepath)) {
+				if (Sys.info()["sysname"]=="Darwin") {
+					system(paste("chmod 755 '", myFilepath, "'", sep=""))
+				}				
 			}
 		}
 	}

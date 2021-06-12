@@ -6,7 +6,7 @@
 \usage{
 helper_format_time(
   t,
-  digits = 0,
+  digits = 1,
   addHrsMinSec = FALSE,
   addTimeInSeconds = FALSE
 )
@@ -59,5 +59,6 @@ helper_format_time(12734.2322345, addHrsMinSec=TRUE, digits=3, addTimeInSeconds=
 helper_format_time(2734.2322345, addHrsMinSec=TRUE, digits=3, addTimeInSeconds=TRUE)
 helper_format_time(34.2322345, addHrsMinSec=TRUE, digits=3, addTimeInSeconds=TRUE)
 helper_format_time(0.2322345, addHrsMinSec=TRUE, digits=3, addTimeInSeconds=TRUE)
+
 
 }

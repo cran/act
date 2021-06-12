@@ -35,6 +35,14 @@ export_eaf <- function(t,
 		}
 	}
 	
+	#	t<- meinkorpus@transcripts[["ARG_I_CHI_Santi"]]
+	#	outputPath<-NULL
+	#	filterTierNames<-NULL
+	#	filterSectionStartsec <- NULL
+	#	filterSectionEndsec <- NULL 
+	#	createMediaLinks <- TRUE
+	#	t<- meinkorpus@transcripts[[7]]
+	
 	#=== Get data
 	#--- Filter and cure transcript
 	t <- act::transcripts_filter_single(t, filterTierNames=filterTierNames, filterSectionStartsec = filterSectionStartsec, filterSectionEndsec = filterSectionEndsec)
@@ -107,12 +115,16 @@ export_eaf <- function(t,
 	#iterate through all tierNames
 	if (nrow(t@tiers)>0) {
 		tierNr <- 1
+		#myEAF <- append(myEAF, sprintf("    <TIER LINGUISTIC_TYPE_REF=\"praat\" TIER_ID=\"%s\"/>", t@tiers$name, sep="\n"))
+		
 		for (tierNr in 1:nrow(t@tiers))		{
 			#--- get annotations within tier
 			annotations.tier <- myAnnotations[myAnnotations$tier.name==t@tiers$name[tierNr],]
-			
+
 			if (nrow(annotations.tier)==0) {
+				#--- generate tier AND close
 				myEAF <- append(myEAF, sprintf("    <TIER LINGUISTIC_TYPE_REF=\"praat\" TIER_ID=\"%s\"/>", t@tiers$name[tierNr]))
+				
 			} else {
 				#--- generate tier
 				myEAF <- append(myEAF, sprintf("    <TIER LINGUISTIC_TYPE_REF=\"praat\" TIER_ID=\"%s\">", t@tiers$name[tierNr]))
@@ -140,20 +152,17 @@ export_eaf <- function(t,
 					}
 				}
 				
-				annotations <- paste("        <ANNOTATION>",
+				annotations <- paste(        "        <ANNOTATION>",
 									 sprintf("            <ALIGNABLE_ANNOTATION ANNOTATION_ID=\"%s\" TIME_SLOT_REF1=\"%s\" TIME_SLOT_REF2=\"%s\">", annotations.tier$annotationID, annotations.tier$TIME_SLOT_REF1, annotations.tier$TIME_SLOT_REF2),
-									 sprintf("                <ANNOTATION_VALUE>%s</ANNOTATION_VALUE>",annotations.tier$content ),
-									 "            </ALIGNABLE_ANNOTATION>",
-									 "        </ANNOTATION>", sep="\n")
+									 sprintf("                <ANNOTATION_VALUE>%s</ANNOTATION_VALUE>", annotations.tier$content ),
+									         "            </ALIGNABLE_ANNOTATION>",
+									         "        </ANNOTATION>", sep="\n")
 				
 				myEAF <- append(myEAF, annotations)
 				myEAF <- append(myEAF,         "    </TIER>")
 			}
 		}
-		
-		myEAF <- append(myEAF, sprintf("    <TIER LINGUISTIC_TYPE_REF=\"praat\" TIER_ID=\"%s\"/>", t@tiers$name, sep="\n"))
 	}
-
 	
 	#---
 	myEAF <- append(myEAF, "    <LINGUISTIC_TYPE GRAPHIC_REFERENCES=\"false\" LINGUISTIC_TYPE_ID=\"praat\" TIME_ALIGNABLE=\"true\"/>")

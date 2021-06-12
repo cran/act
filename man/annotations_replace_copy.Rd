@@ -7,8 +7,9 @@
 annotations_replace_copy(
   x,
   pattern,
-  replacement = NA,
-  destTier = "",
+  replacement = NULL,
+  destTier = NULL,
+  addDestTierIfMissing = TRUE,
   filterTranscriptNames = NULL,
   filterTierNames = NULL,
   collapseString = " | "
@@ -21,7 +22,9 @@ annotations_replace_copy(
 
 \item{replacement}{Character string; replacement.}
 
-\item{destTier}{Character string; name of the tier to which the hit should be copied (if no copying is intended set to "").}
+\item{destTier}{Character string; name of the tier to which the hit should be copied (if no copying is intended set to NA).}
+
+\item{addDestTierIfMissing}{Logical; if \code{TRUE} the destination tier will be added if missing in the transcript object, if \code{FALSE} an error will be raised if the destination tier is missing.}
 
 \item{filterTranscriptNames}{Vector of character strings; names of the transcripts to be included.}
 
@@ -35,18 +38,19 @@ Corpus object.
 \description{
 The function searches within the contents of annotations and replaces the search hits. 
 In addition the search hit may be copied to another tier. 
-In case that there is no overlapping annotation in the destination tier a new annotation will be created (based on the time values of the original annotation). In case that there is an overlapping annotation in the destination tier, the search result will be added at the end.
+In case that there is NO overlapping annotation in the destination tier a new annotation will be created (based on the time values of the original annotation). 
+In case that there is an overlapping annotation in the destination tier, the search result will be added at the end.
 }
 \details{
 If only certain transcripts or tiers should be affected set the parameter \code{filterTranscriptNames} and \code{filterTierNames}.
-In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_meta} first.
+In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_makefilter} first.
 }
 \examples{
 library(act)
 
 # Have a look at the first transcript in the examplecorpus:
 printtranscript <- act::export_printtranscript(examplecorpus@transcripts[[1]])
-cat(stringr::str_c(printtranscript, sep="\n", collapse = "\n"))
+cat(printtranscript)
 # In line 01 there is the word "UN".
 
 # Replace this word by "XXX" in the entire corpus
@@ -56,7 +60,7 @@ test <- act::annotations_replace_copy(x=examplecorpus,
 
 # Have a look at the first transcript in the corprus object test:
 printtranscript <- act::export_printtranscript(test@transcripts[[1]])
-cat(stringr::str_c(printtranscript, sep="\n", collapse = "\n"))
+cat(printtranscript)
 # In line 01 there is now "XXX" instead of "UN"
 
 # Insert a tier called "newTier" into all transcripts in the corpus:
@@ -79,7 +83,7 @@ test <- act::annotations_replace_copy(x=examplecorpus,
 
 # Have a look again at the first transcript in the corpus object test.
 printtranscript <- act::export_printtranscript(test@transcripts[[1]])
-cat(stringr::str_c(printtranscript, sep="\n", collapse = "\n"))
+cat(printtranscript)
 # In line 01 you see that "UN" has been replaced by "YYY.
 # In line 02 you see that it has been copied to the tier "newTier".
 
@@ -89,7 +93,7 @@ test <- act::annotations_replace_copy(x=examplecorpus,
 									  pattern="\\\\bUN\\\\b",
 									  destTier = "newTier")
 printtranscript <- act::export_printtranscript(test@transcripts[[1]])
-cat(stringr::str_c(printtranscript, sep="\n", collapse = "\n"))
+cat(printtranscript)
 # In line 01 you see that "UN" has been maintained.
 # In line 02 you see that "UN" it has been copied to the tier "newTier".
 }

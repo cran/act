@@ -4,12 +4,23 @@
 \alias{search_cuts_printtranscript}
 \title{Create print transcripts for all search results}
 \usage{
-search_cuts_printtranscript(x, s, l = NULL, outputFolder = NULL)
+search_cuts_printtranscript(
+  x,
+  s,
+  cutSpanBeforesec = NULL,
+  cutSpanAftersec = NULL,
+  l = NULL,
+  outputFolder = NULL
+)
 }
 \arguments{
 \item{x}{Corpus object.}
 
 \item{s}{Search object.}
+
+\item{cutSpanBeforesec}{Double; Start the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
+
+\item{cutSpanAftersec}{Double; End the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
 
 \item{l}{Layout object.}
 
@@ -24,8 +35,6 @@ The transcripts will be inserted into the column defined in \code{s@cuts.column.
 All transcripts will be stored in \code{s@cuts.printtranscripts}.
 }
 \details{
-\emph{Span} \cr
-If you want to extend the cut before or after each search result, you can modify \code{@cuts.span.beforesec} and \code{@cuts.span.aftersec} in your search object.
 If you want to modify the layout of the print transcripts, create a new layout object with \code{mylayout <- methods::new("layout")}, modify the settings and pass it as argument \code{l}.
 }
 \examples{
@@ -42,7 +51,7 @@ cat(test@cuts.printtranscripts)
 
 # Display all print transcripts from results data frame
 cat(test@results[,mysearch@cuts.column.printtranscript])
-cat(stringr::str_c(test@results[,mysearch@cuts.column.printtranscript], sep="\n", collapse = "\n"))
+cat(test@results[,mysearch@cuts.column.printtranscript])
 
 # Only single print transcript from results data frame
 cat(test@results[1,mysearch@cuts.column.printtranscript])
@@ -54,5 +63,5 @@ test <- act::search_cuts_printtranscript (x=examplecorpus,
 s=mysearch)
 
 # Display all transcript snippets on screen
-cat(stringr::str_c(test@results[,mysearch@cuts.column.printtranscript], sep="\n", collapse = "\n"))
+cat(test@results[,mysearch@cuts.column.printtranscript])
 }

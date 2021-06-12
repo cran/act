@@ -5,31 +5,35 @@
 \title{Merge several transcripts}
 \usage{
 transcripts_merge(
-  trans_destination,
-  trans_updates,
-  identifier_tier = "update",
-  identifier_intervall = ".+",
-  erase_update_sections_completely = TRUE
+  x,
+  destinationTranscriptName,
+  updateTranscriptNames,
+  identifierTier = "update",
+  identifierPattern = ".+",
+  eraseUpdateSectionsCompletely = TRUE
 )
 }
 \arguments{
-\item{trans_destination}{Transcript object; transcript that serves as destination (and will receive the updates).}
+\item{x}{Corpus object;}
 
-\item{trans_updates}{List of transcript objects; transcript objects that will be inserted into the destination transcripts (entirely or in part).}
+\item{destinationTranscriptName}{Character strings; name of transcript hat willl be updated.}
 
-\item{identifier_tier}{Character string;  regular expression that identifies tier (in all trans_updates) in which the sections that will be inserted into trans_destination are marked.}
+\item{updateTranscriptNames}{Vector of character strings; names of transcripts that contain the updates.}
 
-\item{identifier_intervall}{Character string; regular expression that identifies  (in trans_updates) the sections that will be inserted into trans_destination.}
+\item{identifierTier}{Character string;  regular expression that identifies the tier in which the sections are marked, that will be inserted into transDestination.}
 
-\item{erase_update_sections_completely}{Logical; if \code{TRUE} update sections in destination transcript will be erased completely, if \code{FALSE} update sections in the destination tier will not be erased completely but only the tiers that are present in the trans_updates be erased.}
+\item{identifierPattern}{Character string; regular expression that identifies the sections that will be inserted into transDestination.}
+
+\item{eraseUpdateSectionsCompletely}{Logical; if \code{TRUE} update sections in destination transcript will be erased completely, if \code{FALSE} update sections in the destination tier will not be erased completely but only the tiers that are present in the transUpdates be erased.}
 }
 \value{
 Transcript object
 }
 \description{
-Merges several transcripts. One transcript is the destination transcript (the transcript that will be updated). 
-The other transcripts are the update transcripts and contain the updates. 
-The update transcripts need to contain a tier in which the update sections are marked.
+Merges several transcript objects in a corpus object.
+One transcript is the destination transcript (the transcript that will be updated and receives the new data). 
+The other transcripts are the update transcripts (they contain the data that will replace data in teh destination transcript). 
+The update transcripts need to contain a tier in which the update sections are marked with a specific character string.
 }
 \details{
 You may chose between the following two options:
@@ -39,29 +43,44 @@ You may chose between the following two options:
 \examples{
 library(act)
 
-# We have three transcripts that to demonstrate the function \code{transcripts_merge}:
-# - the destination transcript
-trans_destination <- 	examplecorpus@transcripts[["update_destination"]]
-# - two transcripts that contain updates
-trans_updates <- 		c(examplecorpus@transcripts[["update_update1" ]],
-                           examplecorpus@transcripts[["update_update2" ]])
+# We need three transcripts  to demonstrate the function \code{transcripts_merge}:
+# - the destination transcript: "update_destination"
+# - two transcripts that contain updates: "update_update1 and "update_update2"
 
-# Run the function
-test <- transcripts_merge(trans_destination, trans_updates)
+#Have a look at the annotations in the destination transcript first. 
+#It contains 2 annotations:
+examplecorpus@transcripts[["update_destination"]]@annotations
+#Have a look at the annotations in the update_update1 transcript, too: 
+#It contains 3 annotations:
+examplecorpus@transcripts[["update_update1"]]@annotations
 
-# Save the transcript to a TextGrid file.
-# Set the destination file path
-path <- tempfile(pattern = "merge_test", tmpdir = tempdir(),
-                 fileext = ".TextGrid")
+# Run the function with only one update:
+test <- act::transcripts_merge(x=examplecorpus,
+   destinationTranscriptName="update_destination", 
+   updateTranscriptNames = "update_update1")
 
-# It makes more sense, however, to you define a destination folder
-# that is easier to access on your computer:
-\dontrun{
-path <- file.path("PATH_TO_AN_EXISTING_FOLDER_ON_YOUR_COMPUTER",
-                    paste(t@name, ".TextGrid", sep=""))
+#Have a look at the annotations in the destination transcript again.
+#It now contains 5 annotations:
+test@transcripts[["update_destination"]]@annotations
+
+
+# Run the function with two transcript objects for updates:
+test <- act::transcripts_merge(x=examplecorpus,
+	destinationTranscriptName="update_destination", 
+	updateTranscriptNames = c("update_update1","update_update2"))
+
+#Have a look at the annotations in the destination transcript again.
+#It now contains 8 annotations:
+test@transcripts[["update_destination"]]@annotations
+
+# Compare the transcript in the original and in the modified corpus object. 
+# The update transcript objects are gone:
+act::info_summarized(examplecorpus)$transcripts.names
+act::info_summarized(test)$transcripts.names
+	
+#Have a look at the history of the corpus object
+test@history
 }
-
-# Export
-act::export_textgrid( t=test, outputPath=path)
-
+\seealso{
+\link{transcripts_merge2}
 }

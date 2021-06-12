@@ -7,6 +7,8 @@
 search_cuts_srt(
   x,
   s,
+  cutSpanBeforesec = NULL,
+  cutSpanAftersec = NULL,
   outputFolder = NULL,
   speaker.show = TRUE,
   speaker.width = 3,
@@ -17,6 +19,10 @@ search_cuts_srt(
 \item{x}{Corpus object.}
 
 \item{s}{Search object.}
+
+\item{cutSpanBeforesec}{Double; Start the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
+
+\item{cutSpanAftersec}{Double; End the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.}
 
 \item{outputFolder}{Character string; if parameter is not set, the srt subtitles will only be inserted in \code{s@results}; if the path to a existing folder is given transcripts will be saved in '.srt' format.}
 
@@ -48,7 +54,7 @@ mysearch <- act::search_new(examplecorpus, pattern="yo")
 test <- act::search_cuts_srt (x=examplecorpus, s=mysearch)
 
 # Display srt subtitle of first three results
-cat(test@results[1,mysearch@cuts.column.srt])
+cat(test@results[1:3, mysearch@cuts.column.srt])
 
 # Create srt subtitle including 1 sec before and 5 sec after
 mysearch@cuts.span.beforesec = 1

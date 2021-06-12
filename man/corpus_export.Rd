@@ -9,27 +9,33 @@ corpus_export(
   outputFolder,
   filterTranscriptNames = NULL,
   filterTierNames = NULL,
-  formats = NULL,
-  createMediaLinks = TRUE
+  formats = c("eaf", "exb", "srt", "textgrid", "printtranscript"),
+  createMediaLinks = TRUE,
+  createOutputfolder = TRUE,
+  l = NULL
 )
 }
 \arguments{
 \item{x}{Corpus object.}
 
-\item{outputFolder}{Character string; path to a folder where the transcription files will be saved.}
+\item{outputFolder}{Character string; path to a folder where the transcription files will be saved. By default the forlder will be created recursively it does not exist.}
 
 \item{filterTranscriptNames}{Vector of character strings; names of transcripts to be included. If left unspecified, all transcripts will be exported.}
 
 \item{filterTierNames}{Vector of character strings; names of tiers to be included. If left unspecified, all tiers will be exported.}
 
-\item{formats}{Vector with one or more character strings; output formats, accepted values: 'eaf', 'exb', 'srt', 'textgrid'. If left unspecified, all supported formats will be exported.}
+\item{formats}{Vector with one or more character strings; output formats, accepted values: 'eaf', 'exb', 'srt', 'textgrid', 'printtranscript'. If left unspecified, all supported formats will be exported.}
 
-\item{createMediaLinks}{Logical; if \code{TRUE} media links will be created (affects only eaf files).}
+\item{createMediaLinks}{Logical; if \code{TRUE} media links will be created (affects only 'eaf' and 'exb' files).}
+
+\item{createOutputfolder}{Logical; if \code{TRUE} the outputfolder will be created recursively in case that it does not exist.}
+
+\item{l}{Layout object. layout of print transcripts (affects only 'printtranscript' files).}
 }
 \description{
 Exports all (or some) transcript objects in a corpus object to different annotation file formats.
 If only some transcripts or tiers should be affected set the parameter \code{filterTranscriptNames} and \code{filterTierNames}.
-In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_meta} first.
+In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_makefilter} first.
 }
 \examples{
 library(act)

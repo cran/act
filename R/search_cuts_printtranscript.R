@@ -4,12 +4,12 @@
 #' The transcripts will be inserted into the column defined in \code{s@cuts.column.printtranscript}.
 #' All transcripts will be stored in \code{s@cuts.printtranscripts}.
 #'
-#' \emph{Span} \cr
-#' If you want to extend the cut before or after each search result, you can modify \code{@cuts.span.beforesec} and \code{@cuts.span.aftersec} in your search object.
 #' If you want to modify the layout of the print transcripts, create a new layout object with \code{mylayout <- methods::new("layout")}, modify the settings and pass it as argument \code{l}.
 #'
 #' @param x Corpus object.
 #' @param s Search object.
+#' @param cutSpanBeforesec Double; Start the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.
+#' @param cutSpanAftersec Double; End the cut some seconds before the hit to include some context; the default NULL will take the value as set in @cuts.span.beforesec of the search object.
 #' @param l Layout object.
 #' @param outputFolder Character string; if parameter is not set, the print transcripts will only be inserted in \code{s@results}; if the path to a existing folder is given transcripts will be saved in '.txt' format.
 #'
@@ -19,7 +19,9 @@
 #' @example inst/examples/search_cuts_printtranscript.R
 #' 
 search_cuts_printtranscript <- function(x, 
-										s, 
+										s,
+										cutSpanBeforesec = NULL,
+										cutSpanAftersec = NULL,
 										l=NULL, 
 										outputFolder=NULL ) {
 	#x <- corpus
@@ -32,6 +34,12 @@ search_cuts_printtranscript <- function(x,
 	if (is.null(l)) 	{
 		l <- methods::new("layout")
 	}	
+	if (!is.null(cutSpanBeforesec)) 	{
+		s@cuts.span.beforesec       <- as.double(cutSpanBeforesec)
+	}
+	if (!is.null(cutSpanAftersec)) {
+		s@cuts.span.aftersec        <- as.double(cutSpanAftersec)	
+	}
 	
 	#--- check if output folder is given
 	destination_folder <- NULL
@@ -50,7 +58,6 @@ search_cuts_printtranscript <- function(x,
 			}
 		}
 	}	
-	
 	myWarnings <- ""
 	
 	#create sub folders for text
@@ -64,7 +71,6 @@ search_cuts_printtranscript <- function(x,
 	if (nrow(s@results)>0) {
 		for (i in 1:nrow(s@results)) 	{
 			helper_progress_tick()
-			
 			#=== get transcript
 			t <- NULL
 			
@@ -97,7 +103,7 @@ search_cuts_printtranscript <- function(x,
 				
 				#=== get start & end
 				startSec 	<- max(0, s@results$startSec[i] - s@cuts.span.beforesec)
-				endSec 		<- min(s@results$endSec[i] + s@cuts.span.beforesec, t@length)
+				endSec 		<- min(s@results$endSec[i] + s@cuts.span.beforesec, t@length.sec)
 				
 				#arrow
 				if (!l@arrow.insert) {
@@ -153,37 +159,39 @@ search_cuts_printtranscript <- function(x,
 		s@cuts.printtranscripts <- stringr::str_flatten(alltranscripts, collapse="\n")
 		
 		# if output folder is given
-		if (!is.null(destination_folder)) {
-			
-			#--- save cummulated transcripts as TXT
-			filename <- paste("searchResults_",  s@name, ".txt", sep="")
-			myFilepath 	<- file.path(destination_folder, filename)
-			fileConn 	<- file(myFilepath)
-			writeLines(alltranscripts, fileConn)
-			close(fileConn)
-			
-			#--- save modified results
-			# R
-			filename <- paste("searchResults_", s@name, ".RData", sep="")
-			path_R 	    <-	file.path(destination_folder, filename)
-			save(s, file = path_R)
-			
-			# CSV
-			filename <- paste("searchResults_", s@name, ".csv", sep="")
-			path_CSV 		<- file.path(destination_folder, filename)
-			act::search_results_export(s, path_CSV, saveAsCSV = TRUE)
-			
-			# XLSX
-			filename <- paste("searchResults_", s@name, ".xlsx", sep="")
-			path_XLSX  <- file.path(destination_folder, filename)
-			act::search_results_export(s, path_XLSX)
+		if (!is.null(destination_folder)) { 
+			if (!destination_folder=="NULL") {
+				
+				#--- save cummulated transcripts as TXT
+				filename <- paste("searchResults_",  s@name, ".txt", sep="")
+				myFilepath 	<- file.path(destination_folder, filename)
+				fileConn 	<- file(myFilepath)
+				writeLines(alltranscripts, fileConn)
+				close(fileConn)
+				
+				#--- save modified results
+				# R
+				filename <- paste("searchResults_", s@name, ".RData", sep="")
+				path_R 	    <-	file.path(destination_folder, filename)
+				save(s, file = path_R)
+
+				# CSV
+				filename <- paste("searchResults_", s@name, ".csv", sep="")
+				path_CSV 		<- file.path(destination_folder, filename)
+				act::search_results_export(s, path_CSV, saveAsCSV = TRUE)
+
+				# XLSX
+				filename <- paste("searchResults_", s@name, ".xlsx", sep="")
+				path_XLSX  <- file.path(destination_folder, filename)
+				act::search_results_export(s, path_XLSX)
+			}
 		}
 	}
 	#=== print warnings
 	if (!myWarnings=="") {
 		warning(myWarnings)		
 	}
-	
+
 	#=== give modified results back
 	return(s)
 }

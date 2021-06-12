@@ -2,7 +2,7 @@
 #'
 #' Delete empty annotations in a corpus object.
 #' If only certain transcripts or tiers should be affected set the parameter \code{filterTranscriptNames} and \code{filterTierNames}.
-#' In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_meta} first.
+#' In case that you want to select transcripts and/or tiers by using regular expressions use the function \code{act::search_makefilter} first.
 #' 
 #' @param x Corpus object.
 #' @param trimBeforeCheck Logical; if \code{TRUE} leading and trailing spaces will be deleted before checking (as a consequence record sets that contain only spaces will be deleted, too).
@@ -78,7 +78,6 @@ annotations_delete_empty <- function (x,
 				annotations.deleted.count  = length(annotations_deleted_ids)
 			)
 			
-			
 			#increase counter for corpus object
 			transcripts_modified_nr <- transcripts_modified_nr +1
 			transcripts_modified_ids=c(transcripts_modified_ids, i)
@@ -95,6 +94,5 @@ annotations_delete_empty <- function (x,
 		transcripts.modified.ids         = transcripts_modified_ids,
 		annotations.deleted.total.count  = annotations_deleted_total_nr
 	)
-	
 	return (x)
 }

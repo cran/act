@@ -3,7 +3,7 @@
 #' Converts tier types between 'interval' and 'point' tier.  
 #' Applies to all tiers in all transcript objects of a corpus.
 #' If only certain transcripts or tiers should be affected set the parameter \code{filterTranscriptNames}. 
-#' In case that you want to select transcripts by using regular expressions use the function \code{act::search_meta} first.
+#' In case that you want to select transcripts by using regular expressions use the function \code{act::search_makefilter} first.
 #' 
 #' Note: When converting from interval > point tier, the original end times of the annotations will be lost definitely.
 #' 
@@ -77,7 +77,7 @@ tiers_convert <- function(x,
 					#get all end times
 					ids <- which(x@transcripts[[i]]@annotations$tier.name==j)
 					if (length(ids)>0) {
-						newTimes <- c(x@transcripts[[i]]@annotations$endSec[ids], x@transcripts[[i]]@length)
+						newTimes <- c(x@transcripts[[i]]@annotations$endSec[ids], x@transcripts[[i]]@length.sec)
 						newTimes <- newTimes[2:length(newTimes)]
 						x@transcripts[[i]]@annotations$endSec[ids]<- newTimes
 					}
