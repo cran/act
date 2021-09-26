@@ -45,7 +45,7 @@ search_openresult_inelan  <- function(x,
 	path.elan<- getOption("act.path.elan", default="")
 	if(path.elan=="") {
 		stop("ELAN not found. Please set the path to the ELAN executable in the option 'act.path.elan' using options(act.path.elan='PATHTOYOURELANEXECUTABLE')")
-	}else {
+	} else {
 		if(!file.exists(path.elan)) {
 			stop("ELAN not found. Please set the path to the ELAN executable in the option 'act.path.elan' using options(act.path.elan='PATHTOYOURELANEXECUTABLE')")
 		}	
@@ -81,16 +81,16 @@ search_openresult_inelan  <- function(x,
 	
 	#--- create pfsx file
 	#check if pfsx file already exists - make a backup
-#	file.path.eaf<-'/Users/oliverehmer/Desktop/Quiz.eaf'
-#	pattern<- stringr::str_replace(basename(file.path.eaf), pattern='eaf',replacement="*pfsx$") 
-#	filenames <- list.files(dirname(file.path.eaf), pattern=pattern)
-#	filenames <- tools::file_path_sans_ext(filenames)
-#	destination.name <- tools::file_path_sans_ext(basename(file.path.eaf))
-#   check if destinatino name already exists
-#	if(destination.name %in% filenames) {
-#		uniquename<- make.unique(filenames, destination.name)
+	#	file.path.eaf<-'/Users/oliverehmer/Desktop/Quiz.eaf'
+	#	pattern<- stringr::str_replace(basename(file.path.eaf), pattern='eaf',replacement="*pfsx$") 
+	#	filenames <- list.files(dirname(file.path.eaf), pattern=pattern)
+	#	filenames <- tools::file_path_sans_ext(filenames)
+	#	destination.name <- tools::file_path_sans_ext(basename(file.path.eaf))
+	#   check if destinatino name already exists
+	#	if(destination.name %in% filenames) {
+	#		uniquename<- make.unique(filenames, destination.name)
 	#}
-		
+	
 	pfsx<-	   '<?xml version="1.0" encoding="UTF-8"?>
 				<preferences version="1.1"
 				    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.mpi.nl/tools/elan/Prefs_v1.1.xsd">
@@ -117,25 +117,23 @@ search_openresult_inelan  <- function(x,
 	fileConn <- file(file.path.pfsx, open="wb")
 	writeBin(charToRaw(pfsx.1), fileConn, endian="little")
 	close(fileConn)
-
+	
 	#wait until pfsx exists
 	for (i in 1:10) {
 		if(file.exists(file.path.pfsx)) {
-		break	
+			break	
 		}
 		Sys.sleep(0.02)
 	}
-
-	#--- open elan
-	cmd <- sprintf("open -a %s", shQuote(path.elan))
-	rslt <- system(cmd, wait=FALSE)
-
-	system('sleep 1 && ls', wait=FALSE)
 	
-	#--- open eaf file
-	cmd <- sprintf("open -a %s %s", shQuote(path.elan), shQuote(file.path.eaf))
-	rslt <- system(cmd, wait=FALSE)
-
-	
-	
+	if(file.exists(file.path.pfsx)) {
+		#--- open eaf file
+		if (helper_detect_os()=="windows" ){
+			cmd <- sprintf("%s %s",   shQuote(path.elan), shQuote(file.path.eaf))
+		} else {
+			cmd <- sprintf("open %s -a %s",  shQuote(file.path.eaf), shQuote(path.elan))
+		}
+		#--- open file
+		rslt <- system(cmd, wait=FALSE)
+	}
 }

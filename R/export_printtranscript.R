@@ -69,17 +69,17 @@ export_printtranscript <- function (t,
 		filterTierNames<- t@tiers$name
 	}
 	#filter the filterTierNames by regular expressions
-	if (!is.null(l@filter.tier.include.regex)) {
-		if (length(l@filter.tier.include.regex)>0) {
-			if (l@filter.tier.include.regex!="") {
-				filterTierNames <- grep(pattern=l@filter.tier.include.regex, filterTierNames, value=TRUE)
+	if (!is.null(l@filter.tier.includeRegEx)) {
+		if (length(l@filter.tier.includeRegEx)>0) {
+			if (l@filter.tier.includeRegEx!="") {
+				filterTierNames <- grep(pattern=l@filter.tier.includeRegEx, filterTierNames, value=TRUE)
 			}
 		}
 	}
-	if (!is.null(l@filter.tier.exclude.regex)) {
-		if (length(l@filter.tier.exclude.regex)>0) {
-			if (l@filter.tier.exclude.regex!="") {
-				filterTierNames <- filterTierNames[-grep(pattern=l@filter.tier.exclude.regex, filterTierNames)]
+	if (!is.null(l@filter.tier.excludeRegEx)) {
+		if (length(l@filter.tier.excludeRegEx)>0) {
+			if (l@filter.tier.excludeRegEx!="") {
+				filterTierNames <- filterTierNames[-grep(pattern=l@filter.tier.excludeRegEx, filterTierNames)]
 			}
 		}
 	}
@@ -138,12 +138,12 @@ export_printtranscript <- function (t,
 	#===================================== speakers
 	#--- get tier names
 	tierNames 				<- as.character(unique(myAnnotations$tier.name))
-	if (l@pauseTier.regex=="") {
+	if (l@pauseTierRegEx=="") {
 		#if no pause filter -> get all names
 		tierNames_withoutPause <- tierNames
 	} else {
 		#if  pause filter -> get all names but the pause tier
-		tierNames_withoutPause	<- tierNames[setdiff(1:length(tierNames), grep(l@pauseTier.regex, tierNames, ignore.case =TRUE, perl = TRUE))]
+		tierNames_withoutPause	<- tierNames[setdiff(1:length(tierNames), grep(l@pauseTierRegEx, tierNames, ignore.case =TRUE, perl = TRUE))]
 	}
 	
 	# width of the speaker abbreviations (without end character)
@@ -163,9 +163,9 @@ export_printtranscript <- function (t,
 	included_speakers_pos <- !sameSpeaker_pos
 	
 	#--- pause tier ? --> set to ""
-	if (l@pauseTier.regex!="") {
+	if (l@pauseTierRegEx!="") {
 		#set pauses to ""
-		pauses_pos <- grep(l@pauseTier.regex, myAnnotations$speaker, ignore.case =TRUE, perl = TRUE)
+		pauses_pos <- grep(l@pauseTierRegEx, myAnnotations$speaker, ignore.case =TRUE, perl = TRUE)
 		myAnnotations$speaker[pauses_pos] <- ""
 		included_speakers_pos[pauses_pos] <- FALSE
 	}
@@ -190,6 +190,8 @@ export_printtranscript <- function (t,
 	#myAnnotations$text[21]
 	
 	#---- brackets
+	#i<-6
+	#myAnnotations$text[i]
 	if (l@brackets.tryToAlign 		== TRUE) {
 		for (i in 1:length(myAnnotations$text)) {
 			
@@ -207,15 +209,17 @@ export_printtranscript <- function (t,
 			if (startWithBracketI<=openingBracketsI.nr) {
 				
 				#search correspondance for each opening bracket
+				x<-1
 				for (x in startWithBracketI:openingBracketsI.nr) {
 					
-					#exit if next recourdset would be outside the data frame 
+					#exit if next recordset would be outside the data frame 
 					startSearching <- i+1
 					if (startSearching>length(myAnnotations$text)) {
 						break
 					}
 					
 					#start searching at the next dataset
+					j<-startSearching
 					for (j in startSearching:length(myAnnotations$text)) {
 						
 						#exit: if this recordset does not temporally overlap
@@ -230,21 +234,25 @@ export_printtranscript <- function (t,
 							
 							if (openingBracketsJ.nr>0 ) {
 								#get positions and contents of brackets
-								bracket.i <- as.data.frame(stringr::str_locate_all(myAnnotations$text[i], "\\[.*?\\]"), stringsAsFactors = FALSE)
+								bracket.i <- data.frame(stringr::str_locate_all(myAnnotations$text[i], "\\[.*?\\]"), stringsAsFactors = FALSE)
 								bracket.i <- bracket.i[x, ]
 								bracket.i <- cbind(bracket.i, content=as.character(unlist(stringr::str_extract_all(myAnnotations$text[i], "\\[.*?\\]"))[x]), row.names = NULL) #mind the x
 								bracket.i <- cbind(bracket.i, bracketLength=stringr::str_length(bracket.i$content) , row.names = NULL)
 								bracket.i <- cbind(bracket.i, before=stringr::str_trim(stringr::str_sub(myAnnotations$text[i], bracket.i$start-1, bracket.i$start-1 )), row.names = NULL)
 								bracket.i <- cbind(bracket.i, after=stringr::str_trim(stringr::str_sub(myAnnotations$text[i], bracket.i$end+1, bracket.i$end+1 )), row.names = NULL)	
-								bracket.i <- cbind(bracket.i, posSpaceInside=as.data.frame(stringi::stri_locate(as.character(bracket.i$content), regex=" ", mode="last"))$start, row.names = NULL)
+								bracket.i <- cbind(bracket.i, 
+												   posSpaceInside=data.frame(
+												   	stringi::stri_locate(as.character(bracket.i$content), regex=" ", mode="last"), 
+												   	stringsAsFactors= FALSE)$start, 
+												   row.names = NULL)
 								
-								bracket.j <- as.data.frame(stringr::str_locate_all(myAnnotations$text[j], "\\[.*?\\]"), stringsAsFactors = FALSE)
+								bracket.j <- data.frame(stringr::str_locate_all(myAnnotations$text[j], "\\[.*?\\]"), stringsAsFactors = FALSE)
 								bracket.j <- bracket.j[1, ]
 								bracket.j <- cbind(bracket.j, content=as.character(unlist(stringr::str_extract_all(myAnnotations$text[j], "\\[.*?\\]"))[1]), row.names = NULL) #mind the 1
 								bracket.j <- cbind(bracket.j, bracketLength=stringr::str_length(bracket.j$content) , row.names = NULL)
 								bracket.j <- cbind(bracket.j, before=stringr::str_trim(stringr::str_sub(myAnnotations$text[j], bracket.j$start-1, bracket.j$start-1 )), row.names = NULL)
 								bracket.j <- cbind(bracket.j, after=stringr::str_trim(stringr::str_sub(myAnnotations$text[j], bracket.j$end+1, bracket.j$end+1 )), row.names = NULL) #mind the 1
-								bracket.j <- cbind(bracket.j, posSpaceInside=as.data.frame(stringi::stri_locate(as.character(bracket.j$content), regex=" ", mode="last"))$start, row.names = NULL)
+								bracket.j <- cbind(bracket.j, posSpaceInside=data.frame(stringi::stri_locate(as.character(bracket.j$content), regex=" ", mode="last"), stringsAsFactors= FALSE)$start, row.names = NULL)
 								
 								#something went wrong, probably missing closing bracket
 								if (is.null(bracket.i$bracketLength)) {		break}
@@ -268,7 +276,7 @@ export_printtranscript <- function (t,
 									difference <- abs(difference)
 									
 									if (bracket.i$after=="" | stringr::str_detect(bracket.i$after,"\\W")) {
-										#if content ends after ] or a non-word charater follows --> space immediately before ]
+										#if content ends after ] or a non-word character follows --> space immediately before ]
 										insert.pos <- bracket.i$end-1
 										insert.char <- " "
 										
@@ -310,7 +318,8 @@ export_printtranscript <- function (t,
 									}
 									new <- stringr::str_c(stringr::str_sub(myAnnotations$text[i], start=1, end=insert.pos), 
 														  strrep(insert.char, difference), 
-														  stringr::str_sub(myAnnotations$text[i], end=insert.pos+1, stringr::str_length(myAnnotations$text[i])), sep="",
+														  stringr::str_sub(myAnnotations$text[i], start=insert.pos+1, end=stringr::str_length(myAnnotations$text[i])), 
+														  sep="",
 														  collapse="")
 									myAnnotations$text[i] <- new
 									
@@ -387,7 +396,7 @@ export_printtranscript <- function (t,
 								bracket.i <- cbind(bracket.i, bracketLength=stringr::str_length(bracket.i$content) , row.names = NULL)
 								bracket.i <- cbind(bracket.i, before=stringr::str_trim(stringr::str_sub(text_i_wrapped, bracket.i$start-1, bracket.i$start-1 )), row.names = NULL)
 								bracket.i <- cbind(bracket.i, after=stringr::str_trim(stringr::str_sub(text_i_wrapped, bracket.i$end+1, bracket.i$end+1 )), row.names = NULL)	
-								bracket.i <- cbind(bracket.i, posSpaceInside=as.data.frame(stringi::stri_locate(as.character(bracket.i$content), regex=" ", mode="last"))$start, row.names = NULL)
+								bracket.i <- cbind(bracket.i, posSpaceInside=data.frame(stringi::stri_locate(as.character(bracket.i$content), regex=" ", mode="last"), stringsAsFactors		= FALSE)$start, row.names = NULL)
 								
 								
 							} #there are opening brackets in j
@@ -399,6 +408,7 @@ export_printtranscript <- function (t,
 	} #if brackets need to be aligned
 	
 	#wrap and build entire text
+	#i<-7
 	for (i in 1:length(myAnnotations$text)) {
 		
 		if (i==100) {	text_exdent <- text_exdent +1 }
@@ -422,6 +432,7 @@ export_printtranscript <- function (t,
 		
 		#add line to entire text
 		text_all  <- c(text_all, text_line)
+		#print(text_all)
 		
 		#add additional  lines
 		if (l@additionalline1.insert == TRUE) {
