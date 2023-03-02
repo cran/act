@@ -26,6 +26,8 @@ search_run <- function(x, s) {
 	#get transcripts and tiers to include
 	#x <- examplecorpus
 	#s <- mysearch
+	#   necessary for creation of fulltexts including only some tiers
+	#   necessary for searching only in some transcripts
 	myfilter <- act::search_makefilter(x,
 									 filterTranscriptNames        =s@filter.transcript.names, 
 									 filterTranscriptIncludeRegEx =s@filter.transcript.includeRegEx , 
@@ -33,6 +35,7 @@ search_run <- function(x, s) {
 									 filterTierNames              =s@filter.tier.names,	
 									 filterTierIncludeRegEx       =s@filter.tier.includeRegEx,
 									 filterTierExcludeRegEx       =s@filter.tier.excludeRegEx) 
+	#View(myfilter)
 	
 	#=== normalization needed?
 	if (s@search.normalized) {	
@@ -41,8 +44,14 @@ search_run <- function(x, s) {
 		
 	#===  update full texts if full text search
 	if (s@search.mode=="fulltext" | s@search.mode=="fulltext.byTime" | s@search.mode=="fulltext.byTier" )  {
-		x <- act::transcripts_update_fulltexts(x, tierNames=myfilter$tier.names) 
+		#if the fulltext really needs an update will be checked in the function
+		# chekcing if 
+		#	(A) transcript contents have been modified
+		#	(B) another tier filter has been selected
+		x <- act::transcripts_update_fulltexts(x, 
+											   tierNames   = myfilter$tier.names) 
 	}
+	
 
 	#=== Search
 	helper_progress_set("Searching", length(myfilter$transcript.names))
