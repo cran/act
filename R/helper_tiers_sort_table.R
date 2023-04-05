@@ -25,6 +25,12 @@ helper_tiers_sort_table <- function (tierTable,
 									 addMissingTiers=TRUE, 
 									 deleteTiersThatAreNotInTheSortVector=FALSE) {
 	
+
+	#tierTable <- tier.table
+	#sortVector <-sort.vector
+	#addMissingTiers<-TRUE
+	#deleteTiersThatAreNotInTheSortVector<-FALSE
+	
 	#set old and new data frame
 	oldTable <- tierTable[order(tierTable$position),]
 	oldTable$counter <- NA
@@ -43,7 +49,9 @@ helper_tiers_sort_table <- function (tierTable,
 	insertPosition <- -1
 	counter <- 0
 	sortVector <- as.character(sortVector) #needs to be a as.character and not a factor
+	
 	for (myPattern in sortVector) {
+		myPattern <-  stringr::str_escape(myPattern)
 		#increase the counter
 		counter <- counter+1
 		

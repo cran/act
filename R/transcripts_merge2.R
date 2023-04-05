@@ -39,6 +39,19 @@ transcripts_merge2 <- function (destinationTranscript,
 	# identifierTier <- "update"
 	# identifierPattern <- ".+"
 	# eraseUpdateSectionsCompletely <- TRUE
+	
+	
+	#x<-corpus
+	#destinationTranscriptName <- 'destination'
+	#destinationTranscript <- x@transcripts[[destinationTranscriptName]]
+	
+	#updateTranscriptNames <- c('A')
+	#updateTranscripts <- x@transcripts[ids]
+	
+	#identifierTier='status-progress'
+	#identifierPattern=".+"
+	#eraseUpdateSectionsCompletely<-TRUE
+	
 
 	if (missing(destinationTranscript)) 	{stop("Transcript object in parameter 'destinationTranscript' is missing.") 	}
 	if (missing(updateTranscripts)) 	{stop("Transcript object(s) in parameter 'updateTranscripts' is/are missing.") 	}
@@ -74,7 +87,10 @@ transcripts_merge2 <- function (destinationTranscript,
 	tier.table <- act::helper_tiers_merge_tables(destinationTranscript,updateTranscripts )
 	
 	#--- sort table with identifier tier in position 1	
-	tier.table <- act::helper_tiers_sort_table(tierTable=tier.table, sortVector=unique(c(identifierTier, tier.table$name)))
+	sort.vector<- unique(c(identifierTier, tier.table$name))
+	tier.table <- act::helper_tiers_sort_table( tierTable = tier.table, 
+											     sortVector = sort.vector 
+												)
 
 	#--- tiers to object 
 	destinationTranscript@tiers <- tier.table

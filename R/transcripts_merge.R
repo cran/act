@@ -37,6 +37,14 @@ transcripts_merge <- function (x,
 	#updateTranscriptNames <- c('update_update1', 'update_update2')
 	#updateTranscriptNames <- c('update_update1', 'update_update2', 'SDAF', "xxx")
 	
+#	x<-corpus
+#	destinationTranscriptName <- 'destination'
+#	updateTranscriptNames <- c('A')
+#	identifierTier='status-progress'
+#	identifierPattern=".+"
+#	eraseUpdateSectionsCompletely<-TRUE
+	
+	
 	if (missing(x)) 	{stop("Corpus object in parameter 'x' is missing.") 		}	else { if (!methods::is(x,"corpus")   )	{stop("Parameter 'x' needs to be a corpus object.") } }
 	if (missing(destinationTranscriptName))			{stop("Name of destination transcript is missing (parameter: destinationTranscriptName")	}
 	if (missing(updateTranscriptNames))			    {stop("Name(s) of update transcript(s) are missing (parameter: updateTranscriptNames")	}
@@ -71,11 +79,11 @@ transcripts_merge <- function (x,
 	updateTranscripts <- x@transcripts[ids]
 	
 	#=== get the merged trasncript
-	mergedT <- act::transcripts_merge2 (destinationTranscript=destinationTranscript, 
-										updateTranscripts=updateTranscripts, 
-										identifierTier=identifierTier,
-										identifierPattern=identifierPattern,
-										eraseUpdateSectionsCompletely=eraseUpdateSectionsCompletely) 
+	mergedT <- act::transcripts_merge2 (destinationTranscript         = destinationTranscript, 
+										updateTranscripts             = updateTranscripts, 
+										identifierTier                = identifierTier,
+										identifierPattern             = identifierPattern,
+										eraseUpdateSectionsCompletely = eraseUpdateSectionsCompletely) 
 	
 
 	#=== delete  transcripts

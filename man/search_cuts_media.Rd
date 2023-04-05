@@ -14,7 +14,9 @@ search_cuts_media(
   fastVideoPostioning = TRUE,
   videoCodecCopy = FALSE,
   audioCutsAsMP3 = FALSE,
-  Panning = NULL
+  Panning = NULL,
+  filename.append.medianame = FALSE,
+  filename.append.separator = "__"
 )
 }
 \arguments{
@@ -37,6 +39,10 @@ search_cuts_media(
 \item{audioCutsAsMP3}{Logical; If \code{TRUE} audio cuts will be exported as '.mp3' files, using  \code{options()$act.ffmpeg.command.audioCutsAsMP3}.}
 
 \item{Panning}{Integer; 0=leave audio as is (ch1&ch2) , 1=only channel 1 (ch1), 2=only channel 2 (ch2), 3=both channels separated (ch1&ch2), 4=all three versions (ch1&ch2, ch1, ch2). This setting will override the option made in 'act.ffmpeg.exportchannels.fromColumnName' .}
+
+\item{filename.append.medianame}{Logical; if \code{TRUE} the file name of the original media file will be appended to the snippet(s).}
+
+\item{filename.append.separator}{Character string; characters that separate the result id and the media file name.}
 }
 \value{
 Search object; cut lists will be stored in \code{s@cuts.cutlist.mac} and \code{s@cuts.cutlist.win}.
