@@ -6,7 +6,7 @@
 #' In case that you want to select transcripts by using regular expressions use the function \code{act::search_makefilter} first.
 
 #' @param x Corpus object.
-#' @param sortVector Vector of character strings; regular expressions to match the tier names. The order within the vector presents the new order of the tiers. Use "\\*" (=two backslashes and a star) to indicate where tiers that are not present in the sort vector but in the transcript should be inserted.
+#' @param sortVector Vector of character strings; regular expressions to match the tier names. The order within the vector presents the new order of the tiers. Use "\\\\*" (=two backslashes and a star) to indicate where tiers that are not present in the sort vector but in the transcript should be inserted.
 #' @param filterTranscriptNames Vector of character strings; names of the transcripts to be included. 
 #' @param addMissingTiers Logical; if \code{TRUE} all tiers that are given in 'the 'sortVector' but are missing in the transcripts will be added.
 #' @param deleteTiersThatAreNotInTheSortVector Logical; if \code{TRUE} tiers that are not matched by the regular expressions in 'sortVector' will be deleted. Otherwise the will be inserted at the end of the table or at the position defined by '"\\*' in  'sortVector.

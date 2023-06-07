@@ -1,4 +1,4 @@
-3d788e85fd40dce8edc3258f5607f49e *DESCRIPTION
+7a92bebcc301e3eac6fffb6dbbeb9796 *DESCRIPTION
 34cd33a5192af92283cd64d35b94e60a *NAMESPACE
 13408ab934d14d5a80785409d390ab5f *R/act-package.R
 b6e415daf837cf0925df6e05ebeadc0d *R/act_info.R
@@ -64,7 +64,7 @@ d9f6036516e2d0660ad4d5b4ffc4cbf2 *R/tiers_all.R
 a29479719f517f8ff5ecc5e211f3052d *R/tiers_convert.R
 ee96fa72f17da0cb5fdf3e7b5324527b *R/tiers_delete.R
 c2370039013f8786b4289536b2283568 *R/tiers_rename.R
-97cae6bfd38ad38f8c3161170169c83c *R/tiers_sort.R
+9cd62e0cd3c24c35f128d91555dd0554 *R/tiers_sort.R
 95103ee0b59cf90f7bdff53c09c0c305 *R/transcripts_add.R
 ed7793baae858647625d0b3c766ef03b *R/transcripts_cure.R
 a2841c799cef5cc9560320fe73ffa3bd *R/transcripts_cure_single.R
@@ -77,12 +77,12 @@ af2dd264b7cc1340b8287eba26b24b70 *R/transcripts_filter_single.R
 12787b6960d57dc117af6fef9a711f49 *R/transcripts_update_fulltexts.R
 654ccf1c2b61169e5375a302f6e9f617 *R/transcripts_update_normalization.R
 17d25d8a31bc5ad3daf8fce0434290d5 *R/zzz.R
-221f1250d95ab6228ab726ee2cac3d67 *build/vignette.rds
+49c2e1cbf4cc7a126935e7534a69b67f *build/vignette.rds
 31f065de29737cefe623163d8e4ebfb3 *data/examplecorpus.RData
 fe1b4112f2d41dd00fe0df42f9d97b59 *inst/doc/install_ffmpeg.Rmd
-5b373afea2d92c303722eef0e4199daf *inst/doc/install_ffmpeg.html
+edfc2d0a75c01ccebe00c3bb465412e7 *inst/doc/install_ffmpeg.html
 d0644cd8b71e7df7553153fd04d7ef5d *inst/doc/install_sendpraat.Rmd
-57700be2840a8ac17cbf6285c4af5c08 *inst/doc/install_sendpraat.html
+8116396904f21a8697cad6aa1b44dd64 *inst/doc/install_sendpraat.html
 69928090c274a47bc4a56994867b3613 *inst/examples/act-package.R
 dd42030dbab948738eca2a363bf99199 *inst/examples/annotations_delete.R
 b400c20949528a7e52f8dce68d54dcba *inst/examples/annotations_delete_empty.R
@@ -228,7 +228,7 @@ cd33070feecace4c3208f5453e86089f *man/tiers_add.Rd
 62cbfe0f1f4f713799c2908f6f0df19b *man/tiers_convert.Rd
 2f891f7d322035de809bb9eb882bc5e9 *man/tiers_delete.Rd
 42734148355bba48f721bd3303cdac39 *man/tiers_rename.Rd
-ad2473e23302ba2bdf09fd448ac3745a *man/tiers_sort.Rd
+e95b4999577a0eaefc2ebcbff7686123 *man/tiers_sort.Rd
 3bec8ea9f829300f43e2f00d6cf53d47 *man/transcript-class.Rd
 dd9059c25c60c83c7561e1466a6fd68c *man/transcripts_add.Rd
 97c5d8d5a428255f896b18e2b058f8bd *man/transcripts_cure.Rd

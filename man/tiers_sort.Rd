@@ -15,7 +15,7 @@ tiers_sort(
 \arguments{
 \item{x}{Corpus object.}
 
-\item{sortVector}{Vector of character strings; regular expressions to match the tier names. The order within the vector presents the new order of the tiers. Use "\\*" (=two backslashes and a star) to indicate where tiers that are not present in the sort vector but in the transcript should be inserted.}
+\item{sortVector}{Vector of character strings; regular expressions to match the tier names. The order within the vector presents the new order of the tiers. Use "\\\\*" (=two backslashes and a star) to indicate where tiers that are not present in the sort vector but in the transcript should be inserted.}
 
 \item{filterTranscriptNames}{Vector of character strings; names of the transcripts to be included.}
 
